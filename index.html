@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track & Road Tracker - App Corsa & Atletica</title>
+    <!-- Tailwind CSS per lo stile -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js per i grafici -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }
+        .card { background-color: #1e293b; border: 1px solid #334155; border-radius: 0.75rem; }
+        input, select, textarea { background-color: #0f172a !important; border: 1px solid #475569 !important; color: #fff !important; }
+        input:focus, select:focus, textarea:focus { border-color: #38bdf8 !important; outline: none; }
+    </style>
+</head>
+<body class="pb-12">
+
+    <!-- HEADER -->
+    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <span class="text-2xl">⚡</span>
+                <h1 class="text-xl font-bold bg-gradient-to-r from-sky-400 to-emerald-400 bg-clip-text text-transparent">
+                    AthleTrack Pro
+                </h1>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="exportData()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-600 transition">
+                    ⬇️ Backup
+                </button>
+                <label class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-600 transition cursor-pointer">
+                    ⬆️ Importa
+                    <input type="file" id="importFile" class="hidden" accept=".json" onchange="importData(event)">
+                </label>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 mt-6 space-y-6">
+
+        <!-- SEZIONE RECORD PERSONALI (PB) -->
+        <section>
+            <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-3">🏆 I Tuoi Record Personali (PB)</h2>
+            <div id="pbContainer" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
+                <!-- Popolato via JS -->
+            </div>
+        </section>
+
+        <!-- GRIGLIA PRINCIPALE: FORM + GRAFICO -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- FORM INSERIMENTO ALLENAMENTO -->
+            <div class="lg:col-span-5 card p-5">
+                <h2 class="text-lg font-bold mb-4 text-sky-400">➕ Registra Allenamento / Gara</h2>
+                <form id="workoutForm" class="space-y-4">
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Data</label>
+                            <input type="date" id="date" required class="w-full rounded-lg p-2 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Tipo Sessione</label>
+                            <select id="sessionType" onchange="toggleRepsFields()" class="w-full rounded-lg p-2 text-sm">
+                                <option value="singola">Prova Singola / Gara</option>
+                                <option value="ripetute">Ripetute (Serie)</option>
+                                <option value="fondo">Corsa Continua / Fondo</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Distanza</label>
+                            <select id="distanceSelect" onchange="toggleCustomDistance()" class="w-full rounded-lg p-2 text-sm">
+                                <optgroup label="Velocità / Sprint (Pista)">
+                                    <option value="60">60 m</option>
+                                    <option value="100" selected>100 m</option>
+                                    <option value="150">150 m</option>
+                                    <option value="200">200 m</option>
+                                    <option value="300">300 m</option>
+                                    <option value="400">400 m</option>
+                                </optgroup>
+                                <optgroup label="Mezzofondo (Pista)">
+                                    <option value="800">800 m</option>
+                                    <option value="1000">1000 m</option>
+                                    <option value="1500">1500 m</option>
+                                    <option value="3000">3000 m</option>
+                                </optgroup>
+                                <optgroup label="Fondo / Strada">
+                                    <option value="5000">5 km (5000 m)</option>
+                                    <option value="10000">10 km (10000 m)</option>
+                                    <option value="21097">Mezza Maratona (21.1 km)</option>
+                                    <option value="42195">Maratona (42.2 km)</option>
+                                    <option value="custom">Altra distanza (metri)...</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div id="customDistanceDiv" class="hidden">
+                            <label class="block text-xs text-slate-400 mb-1">Metri personalizzati</label>
+                            <input type="number" id="customDistance" placeholder="es. 250 o 8000" class="w-full rounded-lg p-2 text-sm">
+                        </div>
+                        <div id="timeDiv">
+                            <label class="block text-xs text-slate-400 mb-1">Tempo (es. 11.45 o 3:45.20)</label>
+                            <input type="text" id="timeInput" required placeholder="ss.cc o mm:ss.cc" class="w-full rounded-lg p-2 text-sm font-mono">
+                        </div>
+                    </div>
+
+                    <!-- CAMPI EXTRA PER RIPETUTE -->
+                    <div id="repsContainer" class="hidden bg-slate-900/60 p-3 rounded-lg border border-slate-700 grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs text-emerald-400 mb-1">N° Ripetute fatte</label>
+                            <input type="number" id="repsCount" value="1" min="1" placeholder="es. 6" class="w-full rounded-lg p-2 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-emerald-400 mb-1">Recupero (es. 2'30")</label>
+                            <input type="text" id="recoveryInput" placeholder="es. 3'00&quot; o 90s" class="w-full rounded-lg p-2 text-sm">
+                        </div>
+                    </div>
+
+                    <!-- DETTAGLI TECNICI: SCARPE, VENTO, RPE -->
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Scarpe</label>
+                            <select id="shoes" class="w-full rounded-lg p-2 text-xs">
+                                <option value="Chiodate">👟 Chiodate</option>
+                                <option value="Carbonio">🚀 Carbonio/Gara</option>
+                                <option value="A3/Allenamento">🏃 A3 Lento</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Vento / Clima</label>
+                            <input type="text" id="wind" placeholder="es. +1.2 m/s" class="w-full rounded-lg p-2 text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Fatica RPE (1-10)</label>
+                            <input type="number" id="rpe" min="1" max="10" value="7" class="w-full rounded-lg p-2 text-xs">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Note / Parziali delle ripetute</label>
+                        <textarea id="notes" rows="2" placeholder="Es. Parziali: 24.1 - 24.3 - 24.0. Ottime sensazioni in curva." class="w-full rounded-lg p-2 text-sm"></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full bg-gradient-to-r from-sky-500 to-emerald-500 hover:from-sky-400 hover:to-emerald-400 text-slate-950 font-bold py-2.5 rounded-lg transition shadow-lg">
+                        Salva Allenamento
+                    </button>
+                </form>
+            </div>
+
+            <!-- GRAFICO ANDAMENTO -->
+            <div class="lg:col-span-7 card p-5 flex flex-col justify-between">
+                <div>
+                    <div class="flex flex-wrap justify-between items-center gap-2 mb-4">
+                        <h2 class="text-lg font-bold text-emerald-400">📈 Grafico dei Progressi</h2>
+                        <select id="chartFilter" onchange="updateChart()" class="rounded-lg p-1.5 text-sm">
+                            <!-- Popolato dinamicamente -->
+                        </select>
+                    </div>
+                    <div class="relative h-72 w-full">
+                        <canvas id="progressChart"></canvas>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-400 mt-4 text-center">
+                    💡 Seleziona la distanza dal menu in alto a destra per analizzare l'evoluzione dei tuoi tempi.
+                </p>
+            </div>
+
+        </div>
+
+        <!-- STORICO ALLENAMENTI -->
+        <section class="card p-5">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold text-slate-200">📋 Storico Sessioni</h2>
+                <span id="totalWorkoutsBadge" class="text-xs bg-slate-800 text-sky-400 px-2.5 py-1 rounded-full border border-slate-700">0 sessioni</span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-700 text-xs text-slate-400 uppercase">
+                            <th class="py-3 px-2">Data</th>
+                            <th class="py-3 px-2">Distanza</th>
+                            <th class="py-3 px-2">Tipo / Ripetute</th>
+                            <th class="py-3 px-2">Tempo</th>
+                            <th class="py-3 px-2">Ritmo / Velocità</th>
+                            <th class="py-3 px-2">Dettagli & Note</th>
+                            <th class="py-3 px-2 text-right">Azioni</th>
+                        </tr>
+                    </thead>
+                    <tbody id="workoutTableBody" class="divide-y divide-slate-800 text-sm">
+                        <!-- Popolato via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // --- STATO E INIZIALIZZAZIONE ---
+        let workouts = JSON.parse(localStorage.getItem('athletrack_workouts')) || [];
+        let chartInstance = null;
+
+        document.getElementById('date').valueAsDate = new Date();
+
+        // Mostrare/Nascondere campi ripetute e distanza custom
+        function toggleRepsFields() {
+            const type = document.getElementById('sessionType').value;
+            const repsDiv = document.getElementById('repsContainer');
+            if (type === 'ripetute') {
+                repsDiv.classList.remove('hidden');
+                if (document.getElementById('repsCount').value < 2) document.getElementById('repsCount').value = 4;
+            } else {
+                repsDiv.classList.add('hidden');
+                document.getElementById('repsCount').value = 1;
+            }
+        }
+
+        function toggleCustomDistance() {
+            const val = document.getElementById('distanceSelect').value;
+            const customDiv = document.getElementById('customDistanceDiv');
+            customDiv.classList.toggle('hidden', val !== 'custom');
+        }
+
+        // --- PARSER DEI TEMPI ---
+        // Converte "11.45" -> 11.45 sec | "1:58.20" -> 118.20 sec | "1:20:00" -> 4800 sec
+        function parseTimeToSeconds(timeStr) {
+            timeStr = timeStr.trim().replace(',', '.');
+            const parts = timeStr.split(':');
+            let seconds = 0;
+            if (parts.length === 1) {
+                seconds = parseFloat(parts[0]);
+            } else if (parts.length === 2) {
+                seconds = parseInt(parts[0], 10) * 60 + parseFloat(parts[1]);
+            } else if (parts.length === 3) {
+                seconds = parseInt(parts[0], 10) * 3600 + parseInt(parts[1], 10) * 60 + parseFloat(parts[2]);
+            }
+            return isNaN(seconds) ? null : seconds;
+        }
+
+        // Formatta i secondi in stringa leggibile
+        function formatSeconds(sec, distance) {
+            if (distance <= 400 && sec < 60) {
+                return sec.toFixed(2) + 's';
+            }
+            const hrs = Math.floor(sec / 3600);
+            const mins = Math.floor((sec % 3600) / 60);
+            const remSec = (sec % 60);
+            
+            if (hrs > 0) {
+                return `${hrs}:${String(mins).padStart(2, '0')}:${remSec.toFixed(0).padStart(2, '0')}`;
+            }
+            // Se è mezzofondo in pista (<= 3000m) mostra i decimi/centesimi
+            if (distance <= 3000) {
+                return `${mins}:${remSec.toFixed(2).padStart(5, '0')}`;
+            }
+            return `${mins}:${Math.round(remSec).toString().padStart(2, '0')}`;
+        }
+
+        // Calcola Passo (min/km) o Velocità (m/s & km/h)
+        function calculateMetrics(distanceMeters, seconds) {
+            const speedMs = (distanceMeters / seconds).toFixed(2);
+            const speedKmh = ((distanceMeters / seconds) * 3.6).toFixed(1);
+
+            if (distanceMeters <= 400) {
+                return `${speedMs} m/s <span class="text-xs text-slate-400">(${speedKmh} km/h)</span>`;
+            } else {
+                const paceSecPerKm = (seconds / distanceMeters) * 1000;
+                const paceMin = Math.floor(paceSecPerKm / 60);
+                const paceSec = Math.round(paceSecPerKm % 60);
+                return `${paceMin}'${String(paceSec).padStart(2, '0')}"/km <span class="text-xs text-slate-400">(${speedKmh} km/h)</span>`;
+            }
+        }
+
+        function formatDistanceLabel(meters) {
+            if (meters === 21097) return "Mezza Maratona";
+            if (meters === 42195) return "Maratona";
+            if (meters >= 5000 && meters % 1000 === 0) return (meters / 1000) + " km";
+            return meters + " m";
+        }
+
+        // --- SALVATAGGIO NUOVO ALLENAMENTO ---
+        document.getElementById('workoutForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const distSelect = document.getElementById('distanceSelect').value;
+            const distance = distSelect === 'custom' 
+                ? parseInt(document.getElementById('customDistance').value, 10) 
+                : parseInt(distSelect, 10);
+
+            const timeRaw = document.getElementById('timeInput').value;
+            const seconds = parseTimeToSeconds(timeRaw);
+
+            if (!distance || distance <= 0 || !seconds || seconds <= 0) {
+                alert("Inserisci una distanza valida e un formato tempo corretto (es. 11.40 oppure 3:45.20)");
+                return;
+            }
+
+            const sessionType = document.getElementById('sessionType').value;
+            const newWorkout = {
+                id: Date.now(),
+                date: document.getElementById('date').value,
+                sessionType: sessionType,
+                distance: distance,
+                seconds: seconds,
+                reps: sessionType === 'ripetute' ? parseInt(document.getElementById('repsCount').value, 10) || 1 : 1,
+                recovery: sessionType === 'ripetute' ? document.getElementById('recoveryInput').value : '',
+                shoes: document.getElementById('shoes').value,
+                wind: document.getElementById('wind').value,
+                rpe: document.getElementById('rpe').value,
+                notes: document.getElementById('notes').value
+            };
+
+            workouts.push(newWorkout);
+            saveAndRender(distance);
+            
+            // Reset parziale form
+            document.getElementById('timeInput').value = '';
+            document.getElementById('notes').value = '';
+        });
+
+        function deleteWorkout(id) {
+            if (!confirm("Eliminare questo allenamento?")) return;
+            workouts = workouts.filter(w => w.id !== id);
+            saveAndRender();
+        }
+
+        function saveAndRender(selectedDistForChart = null) {
+            // Ordina per data crescente per i calcoli, poi decrescente in tabella
+            workouts.sort((a, b) => new Date(a.date) - new Date(b.date));
+            localStorage.setItem('athletrack_workouts', JSON.stringify(workouts));
+            
+            renderPersonalBests();
+            renderTable();
+            populateChartFilter(selectedDistForChart);
+            updateChart();
+        }
+
+        // --- RENDER BACHECA RECORD PERSONALI (PB) ---
+        function renderPersonalBests() {
+            const container = document.getElementById('pbContainer');
+            container.innerHTML = '';
+
+            const bests = {};
+            workouts.forEach(w => {
+                if (!bests[w.distance] || w.seconds < bests[w.distance].seconds) {
+                    bests[w.distance] = w;
+                }
+            });
+
+            const distances = Object.keys(bests).map(Number).sort((a, b) => a - b);
+
+            if (distances.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-xs text-slate-500 italic">Nessun record registrato. Inserisci il tuo primo allenamento!</div>`;
+                return;
+            }
+
+            distances.forEach(dist => {
+                const pb = bests[dist];
+                const card = document.createElement('div');
+                card.className = 'card p-3 border-l-4 border-l-amber-400';
+                card.innerHTML = `
+                    <div class="text-xs text-slate-400 font-semibold">${formatDistanceLabel(dist)}</div>
+                    <div class="text-lg font-bold text-amber-400 font-mono mt-0.5">${formatSeconds(pb.seconds, dist)}</div>
+                    <div class="text-[11px] text-slate-400 mt-1">${pb.date} ${pb.wind ? `(${pb.wind})` : ''}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // --- RENDER TABELLA STORICO ---
+        function renderTable() {
+            const tbody = document.getElementById('workoutTableBody');
+            document.getElementById('totalWorkoutsBadge').textContent = `${workouts.length} sessioni`;
+            tbody.innerHTML = '';
+
+            const reversed = [...workouts].reverse();
+
+            reversed.forEach(w => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-800/50 transition';
+
+                let typeBadge = `<span class="px-2 py-0.5 rounded text-xs bg-sky-950 text-sky-300 border border-sky-800">Singola/Gara</span>`;
+                if (w.sessionType === 'ripetute') {
+                    typeBadge = `<span class="px-2 py-0.5 rounded text-xs bg-emerald-950 text-emerald-300 border border-emerald-800">${w.reps} x ${w.distance}m</span>
+                                 ${w.recovery ? `<span class="text-xs text-slate-400 block mt-0.5">Rec: ${w.recovery}</span>` : ''}`;
+                } else if (w.sessionType === 'fondo') {
+                    typeBadge = `<span class="px-2 py-0.5 rounded text-xs bg-purple-950 text-purple-300 border border-purple-800">Fondo</span>`;
+                }
+
+                tr.innerHTML = `
+                    <td class="py-3 px-2 font-mono text-xs text-slate-300">${w.date}</td>
+                    <td class="py-3 px-2 font-bold text-slate-100">${formatDistanceLabel(w.distance)}</td>
+                    <td class="py-3 px-2">${typeBadge}</td>
+                    <td class="py-3 px-2 font-mono font-bold text-sky-400">${formatSeconds(w.seconds, w.distance)}</td>
+                    <td class="py-3 px-2 text-slate-200">${calculateMetrics(w.distance, w.seconds)}</td>
+                    <td class="py-3 px-2 text-xs text-slate-300">
+                        <span class="text-slate-400">${w.shoes || ''} ${w.wind ? `• Vento: ${w.wind}` : ''} • RPE: ${w.rpe}/10</span>
+                        ${w.notes ? `<div class="text-slate-200 mt-1 italic">"${w.notes}"</div>` : ''}
+                    </td>
+                    <td class="py-3 px-2 text-right">
+                        <button onclick="deleteWorkout(${w.id})" class="text-rose-400 hover:text-rose-300 text-xs px-2 py-1">🗑️</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- GESTIONE GRAFICO (CHART.JS) ---
+        function populateChartFilter(preferredDistance = null) {
+            const select = document.getElementById('chartFilter');
+            const currentVal = preferredDistance || select.value;
+            const uniqueDistances = [...new Set(workouts.map(w => w.distance))].sort((a, b) => a - b);
+
+            select.innerHTML = '';
+            if (uniqueDistances.length === 0) {
+                select.innerHTML = `<option value="">Nessun dato</option>`;
+                return;
+            }
+
+            uniqueDistances.forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d;
+                opt.textContent = `Andamento: ${formatDistanceLabel(d)}`;
+                if (String(d) === String(currentVal)) opt.selected = true;
+                select.appendChild(opt);
+            });
+        }
+
+        function updateChart() {
+            const dist = parseInt(document.getElementById('chartFilter').value, 10);
+            const ctx = document.getElementById('progressChart').getContext('2d');
+
+            if (chartInstance) chartInstance.destroy();
+
+            const filtered = workouts.filter(w => w.distance === dist);
+
+            if (!dist || filtered.length === 0) return;
+
+            const labels = filtered.map(w => w.date + (w.sessionType === 'ripetute' ? ` (${w.reps}x)` : ''));
+            const dataPoints = filtered.map(w => w.seconds);
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: `Tempo su ${formatDistanceLabel(dist)} (secondi)`,
+                        data: dataPoints,
+                        borderColor: '#38bdf8',
+                        backgroundColor: 'rgba(56, 189, 248, 0.15)',
+                        pointBackgroundColor: '#10b981',
+                        pointRadius: 5,
+                        tension: 0.25,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            // Invertito opzionale? No, ma mostriamo il tempo formattato nel tooltip
+                            ticks: {
+                                color: '#94a3b8',
+                                callback: function(value) { return formatSeconds(value, dist); }
+                            },
+                            grid: { color: '#334155' }
+                        },
+                        x: {
+                            ticks: { color: '#94a3b8' },
+                            grid: { color: '#1e293b' }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#e2e8f0' } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const w = filtered[context.dataIndex];
+                                    return ` Tempo: ${formatSeconds(w.seconds, dist)} (${w.sessionType === 'ripetute' ? w.reps + ' ripetute' : 'Singola'})`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- BACKUP ESPORTA / IMPORTA JSON ---
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(workouts, null, 2));
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", `athletrack_backup_${new Date().toISOString().slice(0,10)}.json`);
+            dlAnchor.click();
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (Array.isArray(imported)) {
+                        workouts = imported;
+                        saveAndRender();
+                        alert("Backup importato con successo!");
+                    }
+                } catch (err) {
+                    alert("File JSON non valido.");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // Inseriamo 3 dati di esempio solo se l'app è completamente vuota al primo avvio
+        if (workouts.length === 0) {
+            workouts = [
+                { id: 1, date: "2026-10-10", sessionType: "singola", distance: 100, seconds: 11.85, reps: 1, recovery: "", shoes: "Chiodate", wind: "+0.5 m/s", rpe: 8, notes: "Test in pista partenza dai blocchi" },
+                { id: 2, date: "2026-10-17", sessionType: "ripetute", distance: 100, seconds: 11.68, reps: 4, recovery: "4'00\"", shoes: "Chiodate", wind: "+0.8 m/s", rpe: 9, notes: "4x100m lanciati, media 11.68" },
+                { id: 3, date: "2026-10-24", sessionType: "singola", distance: 100, seconds: 11.52, reps: 1, recovery: "", shoes: "Chiodate", wind: "+1.1 m/s", rpe: 9, notes: "Nuovo PB stagionale!" },
+                { id: 4, date: "2026-10-20", sessionType: "fondo", distance: 5000, seconds: 1230, reps: 1, recovery: "", shoes: "A3/Allenamento", wind: "", rpe: 7, notes: "Corsa su strada a ritmo medio (20:30)" }
+            ];
+        }
+
+        // Avvio iniziale
+        saveAndRender(100);
+    </script>
+</body>
+</html>
