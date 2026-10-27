@@ -3,28 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Track & Road Tracker - App Corsa & Atletica</title>
-    <!-- Tailwind CSS per lo stile -->
+    <title>AthleTrack Pro 2.0 - Track & Road Intelligence</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js per i grafici -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { background-color: #0f172a; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }
-        .card { background-color: #1e293b; border: 1px solid #334155; border-radius: 0.75rem; }
+        body { background-color: #0b1120; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }
+        .card { background-color: #1e293b; border: 1px solid #334155; border-radius: 0.85rem; }
         input, select, textarea { background-color: #0f172a !important; border: 1px solid #475569 !important; color: #fff !important; }
         input:focus, select:focus, textarea:focus { border-color: #38bdf8 !important; outline: none; }
+        .nav-active { color: #38bdf8; border-top: 2px solid #38bdf8; background: rgba(56, 189, 248, 0.08); }
     </style>
 </head>
-<body class="pb-12">
+<body class="pb-24">
 
-    <!-- HEADER -->
-    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50">
-        <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+    <!-- HEADER SUPERIORE -->
+    <header class="bg-slate-900/95 backdrop-blur border-b border-slate-800 sticky top-0 z-40">
+        <div class="max-w-5xl mx-auto px-4 py-3.5 flex justify-between items-center">
             <div class="flex items-center gap-2">
                 <span class="text-2xl">⚡</span>
-                <h1 class="text-xl font-bold bg-gradient-to-r from-sky-400 to-emerald-400 bg-clip-text text-transparent">
-                    AthleTrack Pro
-                </h1>
+                <div>
+                    <h1 class="text-lg font-bold bg-gradient-to-r from-sky-400 to-emerald-400 bg-clip-text text-transparent leading-none">
+                        AthleTrack Pro 2.0
+                    </h1>
+                    <span class="text-[11px] text-slate-400">Sprint, Mezzofondo & Fondo</span>
+                </div>
             </div>
             <div class="flex gap-2">
                 <button onclick="exportData()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-600 transition">
@@ -38,24 +40,29 @@
         </div>
     </header>
 
-    <main class="max-w-5xl mx-auto px-4 mt-6 space-y-6">
+    <!-- ==========================================
+         PAGINA 1: DIARIO, RIPETUTE & GRAFICI
+         ========================================== -->
+    <main id="pageTracker" class="max-w-5xl mx-auto px-4 mt-6 space-y-6">
 
-        <!-- SEZIONE RECORD PERSONALI (PB) -->
+        <!-- RECORD PERSONALI (PB) -->
         <section>
-            <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-3">🏆 I Tuoi Record Personali (PB)</h2>
-            <div id="pbContainer" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
-                <!-- Popolato via JS -->
+            <div class="flex justify-between items-center mb-2">
+                <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-400">🏆 I Tuoi Record Personali (PB)</h2>
+                <span class="text-[11px] text-slate-500">Calcolati sul miglior tempo singolo</span>
             </div>
+            <div id="pbContainer" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2.5"></div>
         </section>
 
-        <!-- GRIGLIA PRINCIPALE: FORM + GRAFICO -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-            <!-- FORM INSERIMENTO ALLENAMENTO -->
+            <!-- FORM REGISTRAZIONE CON RIPETUTE DINAMICHE E INTERTEMPI -->
             <div class="lg:col-span-5 card p-5">
-                <h2 class="text-lg font-bold mb-4 text-sky-400">➕ Registra Allenamento / Gara</h2>
+                <h2 class="text-base font-bold mb-4 text-sky-400 flex items-center gap-2">
+                    <span>➕</span> Registra Sessione
+                </h2>
+
                 <form id="workoutForm" class="space-y-4">
-                    
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Data</label>
@@ -63,7 +70,7 @@
                         </div>
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Tipo Sessione</label>
-                            <select id="sessionType" onchange="toggleRepsFields()" class="w-full rounded-lg p-2 text-sm">
+                            <select id="sessionType" onchange="handleSessionTypeChange()" class="w-full rounded-lg p-2 text-sm">
                                 <option value="singola">Prova Singola / Gara</option>
                                 <option value="ripetute">Ripetute (Serie)</option>
                                 <option value="fondo">Corsa Continua / Fondo</option>
@@ -73,13 +80,13 @@
 
                     <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs text-slate-400 mb-1">Distanza</label>
+                            <label class="block text-xs text-slate-400 mb-1">Distanza della prova</label>
                             <select id="distanceSelect" onchange="toggleCustomDistance()" class="w-full rounded-lg p-2 text-sm">
                                 <optgroup label="Velocità / Sprint (Pista)">
                                     <option value="60">60 m</option>
-                                    <option value="100" selected>100 m</option>
+                                    <option value="100">100 m</option>
                                     <option value="150">150 m</option>
-                                    <option value="200">200 m</option>
+                                    <option value="200" selected>200 m</option>
                                     <option value="300">300 m</option>
                                     <option value="400">400 m</option>
                                 </optgroup>
@@ -92,35 +99,44 @@
                                 <optgroup label="Fondo / Strada">
                                     <option value="5000">5 km (5000 m)</option>
                                     <option value="10000">10 km (10000 m)</option>
-                                    <option value="21097">Mezza Maratona (21.1 km)</option>
-                                    <option value="42195">Maratona (42.2 km)</option>
-                                    <option value="custom">Altra distanza (metri)...</option>
+                                    <option value="21097">Mezza Maratona</option>
+                                    <option value="42195">Maratona</option>
+                                    <option value="custom">Altra distanza (m)...</option>
                                 </optgroup>
                             </select>
                         </div>
+
                         <div id="customDistanceDiv" class="hidden">
                             <label class="block text-xs text-slate-400 mb-1">Metri personalizzati</label>
-                            <input type="number" id="customDistance" placeholder="es. 250 o 8000" class="w-full rounded-lg p-2 text-sm">
+                            <input type="number" id="customDistance" placeholder="es. 250 o 600" class="w-full rounded-lg p-2 text-sm">
                         </div>
-                        <div id="timeDiv">
-                            <label class="block text-xs text-slate-400 mb-1">Tempo (es. 11.45 o 3:45.20)</label>
-                            <input type="text" id="timeInput" required placeholder="ss.cc o mm:ss.cc" class="w-full rounded-lg p-2 text-sm font-mono">
+
+                        <!-- CONTROLLI RIPETUTE (Numero e Recupero) -->
+                        <div id="repsConfigDiv" class="hidden col-span-2 bg-slate-900/80 p-3 rounded-lg border border-emerald-800/60 grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs text-emerald-400 font-semibold mb-1">N° Ripetute</label>
+                                <input type="number" id="repsCount" value="4" min="1" max="30" onchange="renderRepInputs()" onkeyup="renderRepInputs()" class="w-full rounded-lg p-2 text-sm font-bold">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-emerald-400 font-semibold mb-1">Recupero tra prove</label>
+                                <input type="text" id="recoveryInput" placeholder="es. 3'00&quot; o 90s" class="w-full rounded-lg p-2 text-sm">
+                            </div>
                         </div>
                     </div>
 
-                    <!-- CAMPI EXTRA PER RIPETUTE -->
-                    <div id="repsContainer" class="hidden bg-slate-900/60 p-3 rounded-lg border border-slate-700 grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs text-emerald-400 mb-1">N° Ripetute fatte</label>
-                            <input type="number" id="repsCount" value="1" min="1" placeholder="es. 6" class="w-full rounded-lg p-2 text-sm">
+                    <!-- CONTENITORE DINAMICO DEI TEMPI E DEGLI INTERTEMPI -->
+                    <div class="bg-slate-900/90 p-3.5 rounded-xl border border-slate-700 space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold uppercase tracking-wider text-sky-400" id="repsHeaderLabel">⏱️ Tempo & Intertempi</span>
+                            <span class="text-[11px] text-slate-400">Formato: <code class="text-slate-200">11.45</code> o <code class="text-slate-200">3:45.2</code></span>
                         </div>
-                        <div>
-                            <label class="block text-xs text-emerald-400 mb-1">Recupero (es. 2'30")</label>
-                            <input type="text" id="recoveryInput" placeholder="es. 3'00&quot; o 90s" class="w-full rounded-lg p-2 text-sm">
+
+                        <div id="dynamicRepsList" class="space-y-3 max-h-80 overflow-y-auto pr-1">
+                            <!-- Generato dinamicamente via JS -->
                         </div>
                     </div>
 
-                    <!-- DETTAGLI TECNICI: SCARPE, VENTO, RPE -->
+                    <!-- DETTAGLI TECNICI -->
                     <div class="grid grid-cols-3 gap-2">
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Scarpe</label>
@@ -132,49 +148,53 @@
                         </div>
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Vento / Clima</label>
-                            <input type="text" id="wind" placeholder="es. +1.2 m/s" class="w-full rounded-lg p-2 text-xs">
+                            <input type="text" id="wind" placeholder="es. +0.8 m/s" class="w-full rounded-lg p-2 text-xs">
                         </div>
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Fatica RPE (1-10)</label>
-                            <input type="number" id="rpe" min="1" max="10" value="7" class="w-full rounded-lg p-2 text-xs">
+                            <input type="number" id="rpe" min="1" max="10" value="8" class="w-full rounded-lg p-2 text-xs">
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Note / Parziali delle ripetute</label>
-                        <textarea id="notes" rows="2" placeholder="Es. Parziali: 24.1 - 24.3 - 24.0. Ottime sensazioni in curva." class="w-full rounded-lg p-2 text-sm"></textarea>
+                        <label class="block text-xs text-slate-400 mb-1">Note Tecniche</label>
+                        <textarea id="notes" rows="2" placeholder="Sensazioni, lavoro tecnico, condizioni della pista..." class="w-full rounded-lg p-2 text-sm"></textarea>
                     </div>
 
                     <button type="submit" class="w-full bg-gradient-to-r from-sky-500 to-emerald-500 hover:from-sky-400 hover:to-emerald-400 text-slate-950 font-bold py-2.5 rounded-lg transition shadow-lg">
-                        Salva Allenamento
+                        💾 Salva Allenamento
                     </button>
                 </form>
             </div>
 
-            <!-- GRAFICO ANDAMENTO -->
+            <!-- GRAFICO PROGRESSI -->
             <div class="lg:col-span-7 card p-5 flex flex-col justify-between">
                 <div>
                     <div class="flex flex-wrap justify-between items-center gap-2 mb-4">
-                        <h2 class="text-lg font-bold text-emerald-400">📈 Grafico dei Progressi</h2>
-                        <select id="chartFilter" onchange="updateChart()" class="rounded-lg p-1.5 text-sm">
-                            <!-- Popolato dinamicamente -->
+                        <div>
+                            <h2 class="text-base font-bold text-emerald-400">📈 Grafico Evoluzione Tempi</h2>
+                            <p class="text-xs text-slate-400">Nelle ripetute confronta il Miglior Tempo e la Media della serie</p>
+                        </div>
+                        <select id="chartFilter" onchange="updateChart()" class="rounded-lg p-2 text-sm font-semibold">
+                            <!-- Popolato via JS -->
                         </select>
                     </div>
-                    <div class="relative h-72 w-full">
+                    <div class="relative h-80 w-full">
                         <canvas id="progressChart"></canvas>
                     </div>
                 </div>
-                <p class="text-xs text-slate-400 mt-4 text-center">
-                    💡 Seleziona la distanza dal menu in alto a destra per analizzare l'evoluzione dei tuoi tempi.
-                </p>
+                <div class="mt-4 pt-3 border-t border-slate-800 flex justify-between items-center text-xs text-slate-400">
+                    <span>🔵 Linea Blu: Miglior tempo della sessione</span>
+                    <span>🟢 Linea Tratteggiata: Media delle ripetute</span>
+                </div>
             </div>
 
         </div>
 
-        <!-- STORICO ALLENAMENTI -->
+        <!-- STORICO SESSIONI CON DETTAGLIO RIPETUTE E INTERTEMPI -->
         <section class="card p-5">
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg font-bold text-slate-200">📋 Storico Sessioni</h2>
+                <h2 class="text-base font-bold text-slate-200">📋 Storico Dettagliato Sessioni</h2>
                 <span id="totalWorkoutsBadge" class="text-xs bg-slate-800 text-sky-400 px-2.5 py-1 rounded-full border border-slate-700">0 sessioni</span>
             </div>
             <div class="overflow-x-auto">
@@ -182,89 +202,309 @@
                     <thead>
                         <tr class="border-b border-slate-700 text-xs text-slate-400 uppercase">
                             <th class="py-3 px-2">Data</th>
-                            <th class="py-3 px-2">Distanza</th>
-                            <th class="py-3 px-2">Tipo / Ripetute</th>
-                            <th class="py-3 px-2">Tempo</th>
-                            <th class="py-3 px-2">Ritmo / Velocità</th>
-                            <th class="py-3 px-2">Dettagli & Note</th>
+                            <th class="py-3 px-2">Distanza & Tipo</th>
+                            <th class="py-3 px-2">Sintesi Tempi</th>
+                            <th class="py-3 px-2">Dettaglio Ripetute & Intertempi</th>
+                            <th class="py-3 px-2">Note & Condizioni</th>
                             <th class="py-3 px-2 text-right">Azioni</th>
                         </tr>
                     </thead>
-                    <tbody id="workoutTableBody" class="divide-y divide-slate-800 text-sm">
-                        <!-- Popolato via JS -->
-                    </tbody>
+                    <tbody id="workoutTableBody" class="divide-y divide-slate-800 text-sm"></tbody>
                 </table>
             </div>
         </section>
 
     </main>
 
+    <!-- ==========================================
+         PAGINA 2: LAB, STIME & MARGINI DI MIGLIORAMENTO
+         ========================================== -->
+    <main id="pageLab" class="max-w-5xl mx-auto px-4 mt-6 space-y-6 hidden">
+
+        <!-- INTESTAZIONE E PROFILO ATLETA -->
+        <section class="card p-5 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-sky-500/30">
+            <div class="flex flex-col md:flex-row justify-between gap-4 items-start md:items-center">
+                <div>
+                    <span class="text-xs uppercase tracking-widest text-sky-400 font-bold">🧬 Laboratorio Prestazionale</span>
+                    <h2 class="text-xl font-bold text-white mt-1" id="athleteProfileTitle">Analisi del Profilo Atleta...</h2>
+                    <p class="text-sm text-slate-300 mt-1 max-w-2xl" id="athleteProfileDesc"></p>
+                </div>
+                <div class="bg-slate-950/80 p-3.5 rounded-xl border border-slate-700 text-center min-w-[160px]">
+                    <div class="text-[11px] text-slate-400 uppercase">Distanza Regina (Top)</div>
+                    <div class="text-lg font-bold text-amber-400 mt-0.5" id="bestEventBadge">-</div>
+                    <div class="text-xs text-emerald-400 font-mono" id="bestScoreBadge">0 pt</div>
+                </div>
+            </div>
+
+            <!-- BARRA BILANCIAMENTO SPRINT vs RESISTENZA -->
+            <div class="mt-5 pt-4 border-t border-slate-700/70 grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-slate-900/70 p-3 rounded-lg border border-slate-700">
+                    <div class="flex justify-between text-xs mb-1">
+                        <span class="text-slate-400">⚡ Indice Velocità / Sprint (60-400m)</span>
+                        <span id="sprintScoreText" class="font-bold text-sky-400">-</span>
+                    </div>
+                    <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                        <div id="sprintBar" class="bg-sky-400 h-full transition-all" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="bg-slate-900/70 p-3 rounded-lg border border-slate-700">
+                    <div class="flex justify-between text-xs mb-1">
+                        <span class="text-slate-400">🔥 Indice Mezzofondo (800-3000m)</span>
+                        <span id="midScoreText" class="font-bold text-emerald-400">-</span>
+                    </div>
+                    <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                        <div id="midBar" class="bg-emerald-400 h-full transition-all" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="bg-slate-900/70 p-3 rounded-lg border border-slate-700">
+                    <div class="flex justify-between text-xs mb-1">
+                        <span class="text-slate-400">🫀 Indice Fondo / Aerobico (5k-42k)</span>
+                        <span id="longScoreText" class="font-bold text-purple-400">-</span>
+                    </div>
+                    <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                        <div id="longBar" class="bg-purple-400 h-full transition-all" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TABELLA STIME E MARGINI DI MIGLIORAMENTO -->
+        <section class="card p-5">
+            <div class="mb-4">
+                <h3 class="text-base font-bold text-emerald-400">🔮 Stima Tempi Potenziali & Margini di Miglioramento</h3>
+                <p class="text-xs text-slate-400 mt-0.5">
+                    Confronta i tuoi **PB attuali** con il **Tempo Potenziale** che hai sulle gambe in base alla tua migliore prestazione assoluta. Dove vedi il badge <span class="text-amber-400 font-semibold">🔥 Grande Margine</span> significa che sei sottoperformante rispetto al tuo motore e puoi limare molto lavorando sulle qualità specifiche di quella distanza.
+                </p>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-700 text-xs text-slate-400 uppercase">
+                            <th class="py-3 px-2">Distanza</th>
+                            <th class="py-3 px-2">Tuo PB Attuale</th>
+                            <th class="py-3 px-2">Potenziale sulle Gambe</th>
+                            <th class="py-3 px-2">Passo / Velocità Stimata</th>
+                            <th class="py-3 px-2">Margine (Secondi limabili)</th>
+                            <th class="py-3 px-2">Diagnosi & Consiglio</th>
+                        </tr>
+                    </thead>
+                    <tbody id="predictionsTableBody" class="divide-y divide-slate-800 text-sm">
+                        <!-- Popolato via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- CALCOLATORE RITMI RIPETUTE IN PISTA -->
+        <section class="card p-5">
+            <h3 class="text-base font-bold text-sky-400 mb-1">🎯 Calcolatore Ritmi per le tue Ripetute</h3>
+            <p class="text-xs text-slate-400 mb-4">Seleziona una distanza per scoprire a quali tempi devi girare in allenamento (in base al tuo PB o al tuo Potenziale).</p>
+            <div class="flex flex-wrap gap-3 items-center mb-4">
+                <select id="paceCalcDistance" onchange="renderPaceCalculator()" class="rounded-lg p-2 text-sm">
+                    <option value="100">100 m</option>
+                    <option value="200" selected>200 m</option>
+                    <option value="300">300 m</option>
+                    <option value="400">400 m</option>
+                    <option value="800">800 m</option>
+                    <option value="1000">1000 m</option>
+                </select>
+                <span id="paceCalcReferenceText" class="text-xs text-slate-300 font-mono"></span>
+            </div>
+            <div id="paceCalcGrid" class="grid grid-cols-2 sm:grid-cols-5 gap-3"></div>
+        </section>
+
+    </main>
+
+    <!-- ==========================================
+         BARRA DI NAVIGAZIONE INFERIORE (BOTTOM BAR)
+         ========================================== -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur border-t border-slate-800 z-50">
+        <div class="max-w-md mx-auto grid grid-cols-2">
+            <button id="navBtnTracker" onclick="switchPage('tracker')" class="flex flex-col items-center py-2.5 text-xs font-semibold transition nav-active">
+                <span class="text-lg">⏱️</span>
+                <span>Diario & Pista</span>
+            </button>
+            <button id="navBtnLab" onclick="switchPage('lab')" class="flex flex-col items-center py-2.5 text-xs font-semibold text-slate-400 hover:text-slate-200 transition">
+                <span class="text-lg">🧬</span>
+                <span>Lab & Stime Tempi</span>
+            </button>
+        </div>
+    </nav>
+
     <script>
-        // --- STATO E INIZIALIZZAZIONE ---
-        let workouts = JSON.parse(localStorage.getItem('athletrack_workouts')) || [];
+        // --- MODELLO FISIOLOGICO DI RIFERIMENTO (60m -> Maratona) ---
+        // t500 = Tempo per 500 punti (Buon amatore allenato)
+        // t800 = Tempo per 800 punti (Atleta agonista evoluto)
+        // Questo permette di confrontare scientificamente distanze brevi (anaerobiche) e lunghe (aerobiche)
+        const ATHLETIC_STANDARDS = [
+            { dist: 60,    label: "60 m",           cat: "sprint", t500: 8.15,    t800: 7.12 },
+            { dist: 100,   label: "100 m",          cat: "sprint", t500: 13.10,   t800: 11.30 },
+            { dist: 150,   label: "150 m",          cat: "sprint", t500: 20.00,   t800: 17.10 },
+            { dist: 200,   label: "200 m",          cat: "sprint", t500: 27.00,   t800: 22.90 },
+            { dist: 300,   label: "300 m",          cat: "sprint", t500: 43.50,   t800: 36.20 },
+            { dist: 400,   label: "400 m",          cat: "sprint", t500: 60.50,   t800: 50.20 },
+            { dist: 800,   label: "800 m",          cat: "mid",    t500: 148.0,   t800: 118.0 },
+            { dist: 1000,  label: "1000 m",         cat: "mid",    t500: 195.0,   t800: 153.0 },
+            { dist: 1500,  label: "1500 m",         cat: "mid",    t500: 308.0,   t800: 240.0 },
+            { dist: 3000,  label: "3000 m",         cat: "mid",    t500: 690.0,   t800: 535.0 },
+            { dist: 5000,  label: "5 km",           cat: "long",   t500: 1215.0,  t800: 935.0 },
+            { dist: 10000, label: "10 km",          cat: "long",   t500: 2550.0,  t800: 1950.0 },
+            { dist: 21097, label: "Mezza Maratona", cat: "long",   t500: 5700.0,  t800: 4320.0 },
+            { dist: 42195, label: "Maratona",       cat: "long",   t500: 12240.0, t800: 9180.0 }
+        ];
+
+        // --- STATO GLOBALE ---
+        let workouts = JSON.parse(localStorage.getItem('athletrack_workouts_v2')) || [];
         let chartInstance = null;
 
         document.getElementById('date').valueAsDate = new Date();
 
-        // Mostrare/Nascondere campi ripetute e distanza custom
-        function toggleRepsFields() {
-            const type = document.getElementById('sessionType').value;
-            const repsDiv = document.getElementById('repsContainer');
-            if (type === 'ripetute') {
-                repsDiv.classList.remove('hidden');
-                if (document.getElementById('repsCount').value < 2) document.getElementById('repsCount').value = 4;
+        // --- NAVIGAZIONE TRA PAGINE ---
+        function switchPage(page) {
+            const pTracker = document.getElementById('pageTracker');
+            const pLab = document.getElementById('pageLab');
+            const btnT = document.getElementById('navBtnTracker');
+            const btnL = document.getElementById('navBtnLab');
+
+            if (page === 'tracker') {
+                pTracker.classList.remove('hidden');
+                pLab.classList.add('hidden');
+                btnT.classList.add('nav-active');
+                btnT.classList.remove('text-slate-400');
+                btnL.classList.remove('nav-active');
+                btnL.classList.add('text-slate-400');
+                updateChart();
             } else {
-                repsDiv.classList.add('hidden');
-                document.getElementById('repsCount').value = 1;
+                pTracker.classList.add('hidden');
+                pLab.classList.remove('hidden');
+                btnL.classList.add('nav-active');
+                btnL.classList.remove('text-slate-400');
+                btnT.classList.remove('nav-active');
+                btnT.classList.add('text-slate-400');
+                renderLabPage();
             }
+        }
+
+        // --- GESTIONE FORM DINAMICO (RIPETUTE SINGOLE E INTERTEMPI) ---
+        function handleSessionTypeChange() {
+            const type = document.getElementById('sessionType').value;
+            const repsConfigDiv = document.getElementById('repsConfigDiv');
+            const repsCountInput = document.getElementById('repsCount');
+            const headerLabel = document.getElementById('repsHeaderLabel');
+
+            if (type === 'ripetute') {
+                repsConfigDiv.classList.remove('hidden');
+                if (parseInt(repsCountInput.value) < 2) repsCountInput.value = 4;
+                headerLabel.textContent = "⏱️ Tempi di ogni Ripetuta & Intertempi";
+            } else {
+                repsConfigDiv.classList.add('hidden');
+                repsCountInput.value = 1;
+                headerLabel.textContent = "⏱️ Tempo Finale & Intertempi (Passaggi)";
+            }
+            renderRepInputs();
         }
 
         function toggleCustomDistance() {
             const val = document.getElementById('distanceSelect').value;
-            const customDiv = document.getElementById('customDistanceDiv');
-            customDiv.classList.toggle('hidden', val !== 'custom');
+            document.getElementById('customDistanceDiv').classList.toggle('hidden', val !== 'custom');
         }
 
-        // --- PARSER DEI TEMPI ---
-        // Converte "11.45" -> 11.45 sec | "1:58.20" -> 118.20 sec | "1:20:00" -> 4800 sec
+        function renderRepInputs() {
+            const type = document.getElementById('sessionType').value;
+            const count = type === 'ripetute' ? Math.max(1, Math.min(30, parseInt(document.getElementById('repsCount').value) || 1)) : 1;
+            const container = document.getElementById('dynamicRepsList');
+
+            // Salva eventuali valori già scritti prima di rigenerare
+            const existingValues = [];
+            document.querySelectorAll('.rep-block').forEach((block, idx) => {
+                const mainTime = block.querySelector('.rep-time-input')?.value || '';
+                const splits = [];
+                block.querySelectorAll('.split-row').forEach(sRow => {
+                    splits.push({
+                        dist: sRow.querySelector('.split-dist')?.value || '',
+                        time: sRow.querySelector('.split-time')?.value || ''
+                    });
+                });
+                existingValues[idx] = { mainTime, splits };
+            });
+
+            container.innerHTML = '';
+
+            for (let i = 0; i < count; i++) {
+                const saved = existingValues[i] || { mainTime: '', splits: [] };
+                const repDiv = document.createElement('div');
+                repDiv.className = 'rep-block bg-slate-950/90 p-3 rounded-lg border border-slate-800 space-y-2';
+                
+                const title = count > 1 ? `Ripetuta #${i + 1}` : `Prova Unica`;
+
+                repDiv.innerHTML = `
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="text-xs font-bold text-emerald-400 min-w-[85px]">${title}</span>
+                        <input type="text" required placeholder="Tempo finale (es. 24.30)" value="${saved.mainTime}"
+                               class="rep-time-input flex-1 rounded-lg p-2 text-sm font-mono">
+                        <button type="button" onclick="addSplitRow(${i})" 
+                                class="text-[11px] bg-slate-800 hover:bg-slate-700 text-sky-300 px-2.5 py-2 rounded-lg border border-slate-700 whitespace-nowrap transition">
+                            + Intertempo
+                        </button>
+                    </div>
+                    <div id="splitsContainer_${i}" class="space-y-1.5 pl-3 border-l-2 border-slate-800"></div>
+                `;
+                container.appendChild(repDiv);
+
+                saved.splits.forEach(s => addSplitRow(i, s.dist, s.time));
+            }
+        }
+
+        function addSplitRow(repIndex, defaultDist = '', defaultTime = '') {
+            const splitsContainer = document.getElementById(`splitsContainer_${repIndex}`);
+            const row = document.createElement('div');
+            row.className = 'split-row flex items-center gap-2 pt-1';
+            row.innerHTML = `
+                <span class="text-[11px] text-slate-400">↳ Passaggio a</span>
+                <input type="number" placeholder="metri (es. 100)" value="${defaultDist}" required
+                       class="split-dist w-28 rounded p-1.5 text-xs font-mono">
+                <span class="text-[11px] text-slate-400">in</span>
+                <input type="text" placeholder="tempo (es. 12.10)" value="${defaultTime}" required
+                       class="split-time flex-1 rounded p-1.5 text-xs font-mono">
+                <button type="button" onclick="this.parentElement.remove()" class="text-rose-400 hover:text-rose-300 text-xs px-1">✖</button>
+            `;
+            splitsContainer.appendChild(row);
+        }
+
+        // --- PARSER E FORMATTAZIONE TEMPI ---
         function parseTimeToSeconds(timeStr) {
-            timeStr = timeStr.trim().replace(',', '.');
+            if (!timeStr) return null;
+            timeStr = String(timeStr).trim().replace(',', '.');
             const parts = timeStr.split(':');
             let seconds = 0;
-            if (parts.length === 1) {
-                seconds = parseFloat(parts[0]);
-            } else if (parts.length === 2) {
-                seconds = parseInt(parts[0], 10) * 60 + parseFloat(parts[1]);
-            } else if (parts.length === 3) {
-                seconds = parseInt(parts[0], 10) * 3600 + parseInt(parts[1], 10) * 60 + parseFloat(parts[2]);
-            }
-            return isNaN(seconds) ? null : seconds;
+            if (parts.length === 1) seconds = parseFloat(parts[0]);
+            else if (parts.length === 2) seconds = parseInt(parts[0], 10) * 60 + parseFloat(parts[1]);
+            else if (parts.length === 3) seconds = parseInt(parts[0], 10) * 3600 + parseInt(parts[1], 10) * 60 + parseFloat(parts[2]);
+            return (isNaN(seconds) || seconds <= 0) ? null : seconds;
         }
 
-        // Formatta i secondi in stringa leggibile
-        function formatSeconds(sec, distance) {
-            if (distance <= 400 && sec < 60) {
-                return sec.toFixed(2) + 's';
-            }
+        function formatSeconds(sec, distance = 100) {
+            if (sec === null || sec === undefined || isNaN(sec)) return '-';
+            if (distance <= 400 && sec < 60) return sec.toFixed(2) + 's';
             const hrs = Math.floor(sec / 3600);
             const mins = Math.floor((sec % 3600) / 60);
-            const remSec = (sec % 60);
-            
-            if (hrs > 0) {
-                return `${hrs}:${String(mins).padStart(2, '0')}:${remSec.toFixed(0).padStart(2, '0')}`;
-            }
-            // Se è mezzofondo in pista (<= 3000m) mostra i decimi/centesimi
-            if (distance <= 3000) {
-                return `${mins}:${remSec.toFixed(2).padStart(5, '0')}`;
-            }
+            const remSec = sec % 60;
+            if (hrs > 0) return `${hrs}:${String(mins).padStart(2, '0')}:${Math.round(remSec).toString().padStart(2, '0')}`;
+            if (distance <= 3000) return `${mins}:${remSec.toFixed(2).padStart(5, '0')}`;
             return `${mins}:${Math.round(remSec).toString().padStart(2, '0')}`;
         }
 
-        // Calcola Passo (min/km) o Velocità (m/s & km/h)
+        function formatDistanceLabel(meters) {
+            if (meters === 21097) return "Mezza Maratona";
+            if (meters === 42195) return "Maratona";
+            if (meters >= 5000 && meters % 1000 === 0) return (meters / 1000) + " km";
+            return meters + " m";
+        }
+
         function calculateMetrics(distanceMeters, seconds) {
             const speedMs = (distanceMeters / seconds).toFixed(2);
             const speedKmh = ((distanceMeters / seconds) * 3.6).toFixed(1);
-
             if (distanceMeters <= 400) {
                 return `${speedMs} m/s <span class="text-xs text-slate-400">(${speedKmh} km/h)</span>`;
             } else {
@@ -275,29 +515,48 @@
             }
         }
 
-        function formatDistanceLabel(meters) {
-            if (meters === 21097) return "Mezza Maratona";
-            if (meters === 42195) return "Maratona";
-            if (meters >= 5000 && meters % 1000 === 0) return (meters / 1000) + " km";
-            return meters + " m";
-        }
-
-        // --- SALVATAGGIO NUOVO ALLENAMENTO ---
+        // --- SALVATAGGIO DELL'ALLENAMENTO ---
         document.getElementById('workoutForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
             const distSelect = document.getElementById('distanceSelect').value;
-            const distance = distSelect === 'custom' 
-                ? parseInt(document.getElementById('customDistance').value, 10) 
+            const distance = distSelect === 'custom'
+                ? parseInt(document.getElementById('customDistance').value, 10)
                 : parseInt(distSelect, 10);
 
-            const timeRaw = document.getElementById('timeInput').value;
-            const seconds = parseTimeToSeconds(timeRaw);
-
-            if (!distance || distance <= 0 || !seconds || seconds <= 0) {
-                alert("Inserisci una distanza valida e un formato tempo corretto (es. 11.40 oppure 3:45.20)");
+            if (!distance || distance <= 0) {
+                alert("Inserisci una distanza valida.");
                 return;
             }
+
+            const repBlocks = document.querySelectorAll('.rep-block');
+            const repsData = [];
+
+            for (let i = 0; i < repBlocks.length; i++) {
+                const block = repBlocks[i];
+                const rawMain = block.querySelector('.rep-time-input').value;
+                const mainSec = parseTimeToSeconds(rawMain);
+                if (!mainSec) {
+                    alert(`Formato tempo non valido nella Ripetuta #${i + 1}. Usa es. 11.45 o 2:05.30`);
+                    return;
+                }
+
+                const splits = [];
+                const splitRows = block.querySelectorAll('.split-row');
+                for (let j = 0; j < splitRows.length; j++) {
+                    const sDist = parseInt(splitRows[j].querySelector('.split-dist').value, 10);
+                    const sTime = parseTimeToSeconds(splitRows[j].querySelector('.split-time').value);
+                    if (sDist && sTime) {
+                        splits.push({ dist: sDist, timeSec: sTime });
+                    }
+                }
+                splits.sort((a, b) => a.dist - b.dist);
+                repsData.push({ repNumber: i + 1, timeSec: mainSec, splits: splits });
+            }
+
+            const allTimes = repsData.map(r => r.timeSec);
+            const bestSeconds = Math.min(...allTimes);
+            const avgSeconds = allTimes.reduce((acc, v) => acc + v, 0) / allTimes.length;
 
             const sessionType = document.getElementById('sessionType').value;
             const newWorkout = {
@@ -305,8 +564,10 @@
                 date: document.getElementById('date').value,
                 sessionType: sessionType,
                 distance: distance,
-                seconds: seconds,
-                reps: sessionType === 'ripetute' ? parseInt(document.getElementById('repsCount').value, 10) || 1 : 1,
+                seconds: bestSeconds,      // Miglior tempo (per PB)
+                avgSeconds: avgSeconds,    // Media delle ripetute
+                reps: repsData.length,
+                repsData: repsData,        // Array completo di ogni ripetuta + intertempi
                 recovery: sessionType === 'ripetute' ? document.getElementById('recoveryInput').value : '',
                 shoes: document.getElementById('shoes').value,
                 wind: document.getElementById('wind').value,
@@ -316,89 +577,160 @@
 
             workouts.push(newWorkout);
             saveAndRender(distance);
-            
-            // Reset parziale form
-            document.getElementById('timeInput').value = '';
+
+            // Reset campi tempo
             document.getElementById('notes').value = '';
+            renderRepInputs();
         });
 
         function deleteWorkout(id) {
-            if (!confirm("Eliminare questo allenamento?")) return;
+            if (!confirm("Vuoi davvero eliminare questa sessione?")) return;
             workouts = workouts.filter(w => w.id !== id);
             saveAndRender();
         }
 
         function saveAndRender(selectedDistForChart = null) {
-            // Ordina per data crescente per i calcoli, poi decrescente in tabella
             workouts.sort((a, b) => new Date(a.date) - new Date(b.date));
-            localStorage.setItem('athletrack_workouts', JSON.stringify(workouts));
-            
+            localStorage.setItem('athletrack_workouts_v2', JSON.stringify(workouts));
+
             renderPersonalBests();
             renderTable();
             populateChartFilter(selectedDistForChart);
             updateChart();
         }
 
-        // --- RENDER BACHECA RECORD PERSONALI (PB) ---
-        function renderPersonalBests() {
-            const container = document.getElementById('pbContainer');
-            container.innerHTML = '';
-
+        // --- BACHECA RECORD PERSONALI (PB) ---
+        function getPersonalBestsMap() {
             const bests = {};
             workouts.forEach(w => {
                 if (!bests[w.distance] || w.seconds < bests[w.distance].seconds) {
                     bests[w.distance] = w;
                 }
             });
+            return bests;
+        }
 
+        function renderPersonalBests() {
+            const container = document.getElementById('pbContainer');
+            container.innerHTML = '';
+            const bests = getPersonalBestsMap();
             const distances = Object.keys(bests).map(Number).sort((a, b) => a - b);
 
             if (distances.length === 0) {
-                container.innerHTML = `<div class="col-span-full text-xs text-slate-500 italic">Nessun record registrato. Inserisci il tuo primo allenamento!</div>`;
+                container.innerHTML = `<div class="col-span-full text-xs text-slate-500 italic">Nessun record registrato.</div>`;
                 return;
             }
 
             distances.forEach(dist => {
                 const pb = bests[dist];
+                const score = Math.round(calculateScoreForTime(dist, pb.seconds));
                 const card = document.createElement('div');
                 card.className = 'card p-3 border-l-4 border-l-amber-400';
                 card.innerHTML = `
-                    <div class="text-xs text-slate-400 font-semibold">${formatDistanceLabel(dist)}</div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-slate-400 font-semibold">${formatDistanceLabel(dist)}</span>
+                        <span class="text-[10px] bg-amber-500/10 text-amber-300 px-1.5 py-0.5 rounded font-mono">${score} pt</span>
+                    </div>
                     <div class="text-lg font-bold text-amber-400 font-mono mt-0.5">${formatSeconds(pb.seconds, dist)}</div>
-                    <div class="text-[11px] text-slate-400 mt-1">${pb.date} ${pb.wind ? `(${pb.wind})` : ''}</div>
+                    <div class="text-[11px] text-slate-400 mt-0.5">${pb.date}</div>
                 `;
                 container.appendChild(card);
             });
         }
 
-        // --- RENDER TABELLA STORICO ---
+        // --- FORMATTAZIONE INTERTEMPI E PARZIALI LANCIATI ---
+        function renderRepsAndSplitsHTML(w) {
+            if (!w.repsData || w.repsData.length === 0) {
+                return `<span class="text-xs text-slate-400">Tempo unico: ${formatSeconds(w.seconds, w.distance)}</span>`;
+            }
+
+            return `<div class="space-y-1.5">` + w.repsData.map(rep => {
+                let splitsHtml = '';
+                if (rep.splits && rep.splits.length > 0) {
+                    const splitBadges = [];
+                    let prevDist = 0;
+                    let prevTime = 0;
+
+                    rep.splits.forEach(s => {
+                        const segmentDist = s.dist - prevDist;
+                        const segmentTime = s.timeSec - prevTime;
+                        const flyingInfo = prevDist > 0
+                            ? ` (frazione ${prevDist}→${s.dist}m: ${segmentTime.toFixed(2)}s)`
+                            : '';
+                        splitBadges.push(`<span class="text-[11px] bg-slate-900 text-sky-300 px-1.5 py-0.5 rounded border border-slate-700 font-mono">Pass. ${s.dist}m: <b>${formatSeconds(s.timeSec, s.dist)}</b>${flyingInfo}</span>`);
+                        prevDist = s.dist;
+                        prevTime = s.timeSec;
+                    });
+
+                    // Calcola anche l'ultimo tratto lanciato fino al traguardo!
+                    if (prevDist < w.distance) {
+                        const lastSegTime = rep.timeSec - prevTime;
+                        if (lastSegTime > 0) {
+                            splitBadges.push(`<span class="text-[11px] bg-emerald-950/60 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-800/60 font-mono">Chiusura ${prevDist}→${w.distance}m (lanciato): <b>${formatSeconds(lastSegTime, w.distance - prevDist)}</b></span>`);
+                        }
+                    }
+
+                    splitsHtml = `<div class="flex flex-wrap gap-1 mt-1">${splitBadges.join('')}</div>`;
+                }
+
+                const label = w.repsData.length > 1 ? `#${rep.repNumber}:` : `Finale:`;
+                return `
+                    <div class="bg-slate-900/60 px-2.5 py-1.5 rounded border border-slate-800">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-slate-400 font-semibold">${label}</span>
+                            <span class="font-mono font-bold text-slate-100">${formatSeconds(rep.timeSec, w.distance)}</span>
+                            <span class="text-xs text-slate-400">(${calculateMetrics(w.distance, rep.timeSec)})</span>
+                        </div>
+                        ${splitsHtml}
+                    </div>
+                `;
+            }).join('') + `</div>`;
+        }
+
+        // --- TABELLA STORICO ---
         function renderTable() {
             const tbody = document.getElementById('workoutTableBody');
             document.getElementById('totalWorkoutsBadge').textContent = `${workouts.length} sessioni`;
             tbody.innerHTML = '';
 
-            const reversed = [...workouts].reverse();
-
-            reversed.forEach(w => {
+            [...workouts].reverse().forEach(w => {
                 const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-800/50 transition';
+                tr.className = 'hover:bg-slate-800/40 transition align-top';
 
-                let typeBadge = `<span class="px-2 py-0.5 rounded text-xs bg-sky-950 text-sky-300 border border-sky-800">Singola/Gara</span>`;
+                const avgSec = w.avgSeconds || w.seconds;
+                let summaryHtml = `
+                    <div class="font-mono font-bold text-sky-400 text-base">${formatSeconds(w.seconds, w.distance)} <span class="text-[10px] font-normal text-slate-400">(Best)</span></div>
+                `;
+
+                if (w.reps > 1 && w.repsData) {
+                    const maxSec = Math.max(...w.repsData.map(r => r.timeSec));
+                    const dropOff = (maxSec - w.seconds).toFixed(2);
+                    summaryHtml += `
+                        <div class="text-xs font-mono text-emerald-400 mt-0.5">Media: ${formatSeconds(avgSec, w.distance)}</div>
+                        <div class="text-[11px] text-slate-400 mt-0.5">Scarto min/max: ${dropOff}s</div>
+                    `;
+                } else {
+                    summaryHtml += `<div class="text-xs text-slate-300 mt-0.5">${calculateMetrics(w.distance, w.seconds)}</div>`;
+                }
+
+                let badgeType = `<span class="px-2 py-0.5 rounded text-xs bg-sky-950 text-sky-300 border border-sky-800">Singola / Gara</span>`;
                 if (w.sessionType === 'ripetute') {
-                    typeBadge = `<span class="px-2 py-0.5 rounded text-xs bg-emerald-950 text-emerald-300 border border-emerald-800">${w.reps} x ${w.distance}m</span>
-                                 ${w.recovery ? `<span class="text-xs text-slate-400 block mt-0.5">Rec: ${w.recovery}</span>` : ''}`;
+                    badgeType = `<span class="px-2 py-0.5 rounded text-xs bg-emerald-950 text-emerald-300 border border-emerald-800 font-bold">${w.reps} x ${w.distance}m</span>
+                                 ${w.recovery ? `<div class="text-[11px] text-slate-400 mt-1">Rec: ${w.recovery}</div>` : ''}`;
                 } else if (w.sessionType === 'fondo') {
-                    typeBadge = `<span class="px-2 py-0.5 rounded text-xs bg-purple-950 text-purple-300 border border-purple-800">Fondo</span>`;
+                    badgeType = `<span class="px-2 py-0.5 rounded text-xs bg-purple-950 text-purple-300 border border-purple-800">Fondo</span>`;
                 }
 
                 tr.innerHTML = `
-                    <td class="py-3 px-2 font-mono text-xs text-slate-300">${w.date}</td>
-                    <td class="py-3 px-2 font-bold text-slate-100">${formatDistanceLabel(w.distance)}</td>
-                    <td class="py-3 px-2">${typeBadge}</td>
-                    <td class="py-3 px-2 font-mono font-bold text-sky-400">${formatSeconds(w.seconds, w.distance)}</td>
-                    <td class="py-3 px-2 text-slate-200">${calculateMetrics(w.distance, w.seconds)}</td>
+                    <td class="py-3 px-2 font-mono text-xs text-slate-300 whitespace-nowrap">${w.date}</td>
+                    <td class="py-3 px-2">
+                        <div class="font-bold text-slate-100 mb-1">${formatDistanceLabel(w.distance)}</div>
+                        ${badgeType}
+                    </td>
+                    <td class="py-3 px-2 whitespace-nowrap">${summaryHtml}</td>
+                    <td class="py-3 px-2 min-w-[260px]">${renderRepsAndSplitsHTML(w)}</td>
                     <td class="py-3 px-2 text-xs text-slate-300">
-                        <span class="text-slate-400">${w.shoes || ''} ${w.wind ? `• Vento: ${w.wind}` : ''} • RPE: ${w.rpe}/10</span>
+                        <div class="text-slate-400">${w.shoes || ''} ${w.wind ? `• ${w.wind}` : ''} • RPE ${w.rpe}/10</div>
                         ${w.notes ? `<div class="text-slate-200 mt-1 italic">"${w.notes}"</div>` : ''}
                     </td>
                     <td class="py-3 px-2 text-right">
@@ -409,22 +741,17 @@
             });
         }
 
-        // --- GESTIONE GRAFICO (CHART.JS) ---
+        // --- GRAFICO EVOLUZIONE (MIGLIOR TEMPO + MEDIA RIPETUTE) ---
         function populateChartFilter(preferredDistance = null) {
             const select = document.getElementById('chartFilter');
             const currentVal = preferredDistance || select.value;
             const uniqueDistances = [...new Set(workouts.map(w => w.distance))].sort((a, b) => a - b);
 
             select.innerHTML = '';
-            if (uniqueDistances.length === 0) {
-                select.innerHTML = `<option value="">Nessun dato</option>`;
-                return;
-            }
-
             uniqueDistances.forEach(d => {
                 const opt = document.createElement('option');
                 opt.value = d;
-                opt.textContent = `Andamento: ${formatDistanceLabel(d)}`;
+                opt.textContent = `Distanza: ${formatDistanceLabel(d)}`;
                 if (String(d) === String(currentVal)) opt.selected = true;
                 select.appendChild(opt);
             });
@@ -433,41 +760,48 @@
         function updateChart() {
             const dist = parseInt(document.getElementById('chartFilter').value, 10);
             const ctx = document.getElementById('progressChart').getContext('2d');
-
             if (chartInstance) chartInstance.destroy();
 
             const filtered = workouts.filter(w => w.distance === dist);
-
             if (!dist || filtered.length === 0) return;
 
-            const labels = filtered.map(w => w.date + (w.sessionType === 'ripetute' ? ` (${w.reps}x)` : ''));
-            const dataPoints = filtered.map(w => w.seconds);
+            const labels = filtered.map(w => w.date + (w.reps > 1 ? ` (${w.reps}x)` : ''));
+            const bestPoints = filtered.map(w => w.seconds);
+            const avgPoints = filtered.map(w => w.avgSeconds || w.seconds);
 
             chartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
-                    datasets: [{
-                        label: `Tempo su ${formatDistanceLabel(dist)} (secondi)`,
-                        data: dataPoints,
-                        borderColor: '#38bdf8',
-                        backgroundColor: 'rgba(56, 189, 248, 0.15)',
-                        pointBackgroundColor: '#10b981',
-                        pointRadius: 5,
-                        tension: 0.25,
-                        fill: true
-                    }]
+                    datasets: [
+                        {
+                            label: 'Miglior Tempo Sessione',
+                            data: bestPoints,
+                            borderColor: '#38bdf8',
+                            backgroundColor: 'rgba(56, 189, 248, 0.12)',
+                            pointBackgroundColor: '#38bdf8',
+                            pointRadius: 5,
+                            tension: 0.25,
+                            fill: true
+                        },
+                        {
+                            label: 'Media Ripetute',
+                            data: avgPoints,
+                            borderColor: '#10b981',
+                            borderDash: [5, 5],
+                            pointBackgroundColor: '#10b981',
+                            pointRadius: 4,
+                            tension: 0.25,
+                            fill: false
+                        }
+                    ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
                         y: {
-                            // Invertito opzionale? No, ma mostriamo il tempo formattato nel tooltip
-                            ticks: {
-                                color: '#94a3b8',
-                                callback: function(value) { return formatSeconds(value, dist); }
-                            },
+                            ticks: { color: '#94a3b8', callback: v => formatSeconds(v, dist) },
                             grid: { color: '#334155' }
                         },
                         x: {
@@ -480,8 +814,7 @@
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
-                                    const w = filtered[context.dataIndex];
-                                    return ` Tempo: ${formatSeconds(w.seconds, dist)} (${w.sessionType === 'ripetute' ? w.reps + ' ripetute' : 'Singola'})`;
+                                    return ` ${context.dataset.label}: ${formatSeconds(context.raw, dist)}`;
                                 }
                             }
                         }
@@ -490,12 +823,198 @@
             });
         }
 
-        // --- BACKUP ESPORTA / IMPORTA JSON ---
+        // =========================================================================
+        // MOTORE MATEMATICO PAGINA 2: STIME TEMPI & ANALISI MARGINI DI MIGLIORAMENTO
+        // =========================================================================
+
+        function getStandardForDistance(meters) {
+            let exact = ATHLETIC_STANDARDS.find(s => s.dist === meters);
+            if (exact) return exact;
+            // Interpolazione logaritmica per distanze personalizzate
+            let sorted = [...ATHLETIC_STANDARDS].sort((a, b) => Math.abs(a.dist - meters) - Math.abs(b.dist - meters));
+            let closest = sorted[0];
+            let ratio = Math.pow(meters / closest.dist, 1.07);
+            return {
+                dist: meters,
+                label: formatDistanceLabel(meters),
+                cat: meters <= 400 ? "sprint" : (meters <= 3000 ? "mid" : "long"),
+                t500: closest.t500 * ratio,
+                t800: closest.t800 * ratio
+            };
+        }
+
+        // Calcola i punti (0-1000+) per una data distanza e tempo
+        function calculateScoreForTime(meters, seconds) {
+            const std = getStandardForDistance(meters);
+            const k = Math.log(800 / 500) / Math.log(std.t500 / std.t800);
+            return 500 * Math.pow(std.t500 / seconds, k);
+        }
+
+        // Stima il tempo corrispondente a un determinato punteggio (Potenziale)
+        function estimateTimeForScore(meters, targetScore) {
+            const std = getStandardForDistance(meters);
+            const k = Math.log(800 / 500) / Math.log(std.t500 / std.t800);
+            return std.t500 * Math.pow(500 / targetScore, 1 / k);
+        }
+
+        function renderLabPage() {
+            const bests = getPersonalBestsMap();
+            const recordedDistances = Object.keys(bests).map(Number);
+
+            if (recordedDistances.length === 0) return;
+
+            let maxScore = 0;
+            let bestDist = null;
+            const catScores = { sprint: [], mid: [], long: [] };
+
+            recordedDistances.forEach(d => {
+                const w = bests[d];
+                const sc = calculateScoreForTime(d, w.seconds);
+                const std = getStandardForDistance(d);
+                catScores[std.cat].push(sc);
+                if (sc > maxScore) {
+                    maxScore = sc;
+                    bestDist = d;
+                }
+            });
+
+            // Calcolo medie per categoria
+            const avgSprint = catScores.sprint.length ? catScores.sprint.reduce((a,b)=>a+b,0)/catScores.sprint.length : 0;
+            const avgMid = catScores.mid.length ? catScores.mid.reduce((a,b)=>a+b,0)/catScores.mid.length : 0;
+            const avgLong = catScores.long.length ? catScores.long.reduce((a,b)=>a+b,0)/catScores.long.length : 0;
+
+            // Aggiorna Badge e Barre Profilo
+            document.getElementById('bestEventBadge').textContent = `${formatDistanceLabel(bestDist)} (${formatSeconds(bests[bestDist].seconds, bestDist)})`;
+            document.getElementById('bestScoreBadge').textContent = `${Math.round(maxScore)} punti atletici`;
+
+            const updateBar = (idText, idBar, val) => {
+                document.getElementById(idText).textContent = val > 0 ? `${Math.round(val)} pt` : 'Nessun dato';
+                document.getElementById(idBar).style.width = val > 0 ? `${Math.min(100, Math.round(val / 10))}%` : '0%';
+            };
+            updateBar('sprintScoreText', 'sprintBar', avgSprint);
+            updateBar('midScoreText', 'midBar', avgMid);
+            updateBar('longScoreText', 'longBar', avgLong);
+
+            // Diagnosi Intelligente del Profilo Atleta
+            const titleEl = document.getElementById('athleteProfileTitle');
+            const descEl = document.getElementById('athleteProfileDesc');
+            const enduranceScore = Math.max(avgMid, avgLong);
+
+            if (enduranceScore > 0 && avgSprint > 0) {
+                const diff = enduranceScore - avgSprint;
+                if (diff > 55) {
+                    titleEl.textContent = "🫀 Profilo: Specialista Resistente (Forte Margine nello Sprint!)";
+                    descEl.innerHTML = `Sei molto forte sulle distanze lunghe/mezzofondo (<b>${Math.round(enduranceScore)} pt</b>), ma i tuoi tempi nello sprint (<b>${Math.round(avgSprint)} pt</b>) sono alti rispetto al tuo motore. <b>Hai un enorme margine di miglioramento sulle distanze brevi (60m-400m)</b>: lavorando su forza esplosiva, reattività dei piedi e tecnica di accelerazione puoi abbassare drasticamente i tuoi tempi in pista!`;
+                } else if (diff < -55) {
+                    titleEl.textContent = "⚡ Profilo: Velocista Puro (Forte Margine Aerobico!)";
+                    descEl.innerHTML = `Hai un'eccellente velocità di base nello sprint (<b>${Math.round(avgSprint)} pt</b>), ma perdi molto non appena la distanza sale (<b>${Math.round(enduranceScore)} pt</b>). <b>Hai un grande margine di miglioramento dal mezzofondo in su</b>: aumentando il volume aerobico e la soglia anaerobica trasformerai la tua velocità in tempi strabilianti sui 1500m-5000m.`;
+                } else {
+                    titleEl.textContent = "⚖️ Profilo: Atleta Polivalente & Bilanciato";
+                    descEl.innerHTML = `Le tue prestazioni tra velocità veloce (<b>${Math.round(avgSprint)} pt</b>) e resistenza (<b>${Math.round(enduranceScore)} pt</b>) sono ben bilanciate. Controlla la tabella qui sotto per limare i decimi nelle singole specialità.`;
+                }
+            } else {
+                titleEl.textContent = "📊 Profilo in costruzione";
+                descEl.textContent = "Inserisci almeno una prova breve (es. 100m/200m) e una prova lunga (es. 1500m/5000m) per sbloccare il confronto completo tra Velocità e Resistenza.";
+            }
+
+            // Popola Tabella Predittiva & Margini
+            const tbody = document.getElementById('predictionsTableBody');
+            tbody.innerHTML = '';
+
+            ATHLETIC_STANDARDS.forEach(std => {
+                const pbWorkout = bests[std.dist];
+                const potentialSec = estimateTimeForScore(std.dist, maxScore);
+
+                let pbText = `<span class="text-slate-500 italic">Da testare</span>`;
+                let marginText = `<span class="text-xs text-slate-400">Corri questa distanza per scoprire il margine</span>`;
+                let diagnosisBadge = `<span class="px-2 py-0.5 rounded text-xs bg-slate-800 text-slate-300">🎯 Obiettivo Stimato</span>`;
+
+                if (pbWorkout) {
+                    const actualSec = pbWorkout.seconds;
+                    const diffSec = actualSec - potentialSec;
+                    const diffPct = ((actualSec - potentialSec) / actualSec) * 100;
+
+                    pbText = `<span class="font-mono font-bold text-white">${formatSeconds(actualSec, std.dist)}</span>`;
+
+                    if (diffPct <= 1.2) {
+                        marginText = `<span class="font-mono text-emerald-400 font-bold">Ottimizzato (${diffSec <= 0.05 ? 'Top PB' : '-' + formatSeconds(diffSec, std.dist)})</span>`;
+                        diagnosisBadge = `<span class="px-2 py-1 rounded text-xs bg-emerald-950 text-emerald-300 border border-emerald-700 font-semibold">✅ Tuo Punto di Forza</span>`;
+                    } else if (diffPct <= 5.5) {
+                        marginText = `<span class="font-mono text-sky-400 font-bold">-${formatSeconds(diffSec, std.dist)} (${diffPct.toFixed(1)}%)</span>`;
+                        diagnosisBadge = `<span class="px-2 py-1 rounded text-xs bg-sky-950 text-sky-300 border border-sky-700">📈 Buon Margine</span>`;
+                    } else {
+                        marginText = `<span class="font-mono text-amber-400 font-bold text-base">-${formatSeconds(diffSec, std.dist)} (-${diffPct.toFixed(1)}%)</span>`;
+                        const advice = std.cat === 'sprint' ? 'Cura esplosività e lattacido' : 'Cura soglia e tenuta aerobica';
+                        diagnosisBadge = `<span class="px-2 py-1 rounded text-xs bg-amber-950/90 text-amber-300 border border-amber-600 font-bold block">🔥 Grande Margine!</span>
+                                          <span class="text-[11px] text-slate-400">${advice}</span>`;
+                    }
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-800/40 transition';
+                tr.innerHTML = `
+                    <td class="py-3 px-2 font-bold text-slate-200">${std.label}</td>
+                    <td class="py-3 px-2">${pbText}</td>
+                    <td class="py-3 px-2 font-mono font-bold text-emerald-400">${formatSeconds(potentialSec, std.dist)}</td>
+                    <td class="py-3 px-2 text-xs text-slate-300">${calculateMetrics(std.dist, potentialSec)}</td>
+                    <td class="py-3 px-2">${marginText}</td>
+                    <td class="py-3 px-2">${diagnosisBadge}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            renderPaceCalculator(maxScore);
+        }
+
+        // --- CALCOLATORE RITMI RIPETUTE (% DELLO SFORZO) ---
+        function renderPaceCalculator(cachedMaxScore = null) {
+            const dist = parseInt(document.getElementById('paceCalcDistance').value, 10);
+            const bests = getPersonalBestsMap();
+            
+            let refSeconds = null;
+            let sourceLabel = "";
+
+            if (bests[dist]) {
+                refSeconds = bests[dist].seconds;
+                sourceLabel = `Basato sul tuo PB di ${formatSeconds(refSeconds, dist)}`;
+            } else {
+                // Usa il potenziale se non ha mai corso quella distanza
+                let maxScore = cachedMaxScore || 550;
+                refSeconds = estimateTimeForScore(dist, maxScore);
+                sourceLabel = `Basato sul tuo Potenziale stimato di ${formatSeconds(refSeconds, dist)}`;
+            }
+
+            document.getElementById('paceCalcReferenceText').textContent = `(${sourceLabel})`;
+            const grid = document.getElementById('paceCalcGrid');
+            grid.innerHTML = '';
+
+            const percentages = [
+                { pct: 98, desc: "Gara / Massimale", color: "border-rose-500 text-rose-400" },
+                { pct: 95, desc: "Tolleranza Lattacida", color: "border-amber-500 text-amber-400" },
+                { pct: 90, desc: "Ripetute Specifiche", color: "border-emerald-500 text-emerald-400" },
+                { pct: 85, desc: "Ritmo Estensivo", color: "border-sky-500 text-sky-400" },
+                { pct: 80, desc: "Tecnica / Aerobico", color: "border-purple-500 text-purple-400" }
+            ];
+
+            percentages.forEach(p => {
+                const targetTime = refSeconds / (p.pct / 100);
+                const div = document.createElement('div');
+                div.className = `bg-slate-900/90 p-3 rounded-lg border-l-4 ${p.color}`;
+                div.innerHTML = `
+                    <div class="text-xs font-bold">${p.pct}% Intensità</div>
+                    <div class="text-lg font-mono font-bold text-white mt-0.5">${formatSeconds(targetTime, dist)}</div>
+                    <div class="text-[11px] text-slate-400 mt-0.5">${p.desc}</div>
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        // --- BACKUP ESPORTA / IMPORTA ---
         function exportData() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(workouts, null, 2));
             const dlAnchor = document.createElement('a');
             dlAnchor.setAttribute("href", dataStr);
-            dlAnchor.setAttribute("download", `athletrack_backup_${new Date().toISOString().slice(0,10)}.json`);
+            dlAnchor.setAttribute("download", `athletrack_v2_backup_${new Date().toISOString().slice(0,10)}.json`);
             dlAnchor.click();
         }
 
@@ -518,18 +1037,38 @@
             reader.readAsText(file);
         }
 
-        // Inseriamo 3 dati di esempio solo se l'app è completamente vuota al primo avvio
+        // --- DATI DI ESEMPIO INIZIALI (per mostrare subito ripetute, intertempi e margini) ---
         if (workouts.length === 0) {
             workouts = [
-                { id: 1, date: "2026-10-10", sessionType: "singola", distance: 100, seconds: 11.85, reps: 1, recovery: "", shoes: "Chiodate", wind: "+0.5 m/s", rpe: 8, notes: "Test in pista partenza dai blocchi" },
-                { id: 2, date: "2026-10-17", sessionType: "ripetute", distance: 100, seconds: 11.68, reps: 4, recovery: "4'00\"", shoes: "Chiodate", wind: "+0.8 m/s", rpe: 9, notes: "4x100m lanciati, media 11.68" },
-                { id: 3, date: "2026-10-24", sessionType: "singola", distance: 100, seconds: 11.52, reps: 1, recovery: "", shoes: "Chiodate", wind: "+1.1 m/s", rpe: 9, notes: "Nuovo PB stagionale!" },
-                { id: 4, date: "2026-10-20", sessionType: "fondo", distance: 5000, seconds: 1230, reps: 1, recovery: "", shoes: "A3/Allenamento", wind: "", rpe: 7, notes: "Corsa su strada a ritmo medio (20:30)" }
+                {
+                    id: 1, date: "2026-10-12", sessionType: "fondo", distance: 5000,
+                    seconds: 1065, avgSeconds: 1065, reps: 1,
+                    repsData: [{ repNumber: 1, timeSec: 1065, splits: [{ dist: 1000, timeSec: 210 }, { dist: 3000, timeSec: 638 }] }],
+                    recovery: "", shoes: "Carbonio", wind: "", rpe: 8, notes: "Ottimo 5000m (17:45), motore aerobico molto forte!"
+                },
+                {
+                    id: 2, date: "2026-10-18", sessionType: "singola", distance: 100,
+                    seconds: 13.45, avgSeconds: 13.45, reps: 1,
+                    repsData: [{ repNumber: 1, timeSec: 13.45, splits: [{ dist: 60, timeSec: 8.35 }] }],
+                    recovery: "", shoes: "Chiodate", wind: "+0.4 m/s", rpe: 8, notes: "Partenza un po' legata, margine enorme di velocità"
+                },
+                {
+                    id: 3, date: "2026-10-25", sessionType: "ripetute", distance: 200,
+                    seconds: 26.80, avgSeconds: 27.25, reps: 4,
+                    repsData: [
+                        { repNumber: 1, timeSec: 27.50, splits: [{ dist: 100, timeSec: 13.90 }] },
+                        { repNumber: 2, timeSec: 27.30, splits: [{ dist: 100, timeSec: 13.80 }] },
+                        { repNumber: 3, timeSec: 27.40, splits: [{ dist: 100, timeSec: 13.85 }] },
+                        { repNumber: 4, timeSec: 26.80, splits: [{ dist: 100, timeSec: 13.50 }] }
+                    ],
+                    recovery: "3'00\"", shoes: "Chiodate", wind: "+0.9 m/s", rpe: 9, notes: "4x200m con passaggio ai 100m. Ultima in progressione!"
+                }
             ];
         }
 
-        // Avvio iniziale
-        saveAndRender(100);
+        // Inizializzazione all'avvio
+        handleSessionTypeChange();
+        saveAndRender(200);
     </script>
 </body>
 </html>
