@@ -3,33 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AthleTrack Pro - Apple Edition</title>
+    <title>AthleTrack Pro 5.0 - Apple Intelligence Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { background-color: #000000; color: #f5f5f7; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif; }
-        .apple-card { background: rgba(28, 28, 30, 0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1.25rem; }
-        .apple-input { background: rgba(44, 44, 46, 0.8) !important; border: 1px solid rgba(255, 255, 255, 0.15) !important; color: #fff !important; border-radius: 0.75rem; }
-        .apple-input:focus { border-color: #0a84ff !important; outline: none; box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.3); }
+        .apple-card { background: rgba(28, 28, 30, 0.78); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1.25rem; }
+        .apple-input { background: rgba(44, 44, 46, 0.85) !important; border: 1px solid rgba(255, 255, 255, 0.14) !important; color: #fff !important; border-radius: 0.75rem; transition: all 0.2s; }
+        .apple-input:focus { border-color: #0a84ff !important; outline: none; box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.28); }
         .nav-active { color: #0a84ff !important; background: rgba(10, 132, 255, 0.12); border-top: 2px solid #0a84ff; }
         .apple-btn { background: #0a84ff; color: #ffffff; font-weight: 600; border-radius: 0.75rem; transition: all 0.2s; }
         .apple-btn:hover { background: #0071e3; }
+        .apple-pill { background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 9999px; }
     </style>
 </head>
 <body class="pb-28">
 
     <!-- HEADER APPLE STYLE -->
     <header class="bg-black/80 backdrop-blur-xl border-b border-white/10 sticky top-0 z-40">
-        <div class="max-w-6xl mx-auto px-5 py-4 flex justify-between items-center">
+        <div class="max-w-6xl mx-auto px-5 py-3.5 flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-emerald-400 flex items-center justify-center text-lg shadow-lg shadow-blue-500/20">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 via-indigo-500 to-emerald-400 flex items-center justify-center text-lg shadow-lg shadow-blue-500/20">
                     ⚡
                 </div>
                 <div>
                     <h1 class="text-base font-semibold tracking-tight text-white leading-none">
-                        AthleTrack Pro
+                        AthleTrack Pro <span class="text-xs font-normal text-blue-400">5.0</span>
                     </h1>
-                    <span class="text-[11px] text-zinc-400">Apple Intelligence Edition</span>
+                    <span class="text-[11px] text-zinc-400">Pacing Non-Lineare, Target Persistenti & Analisi Carico</span>
                 </div>
             </div>
             <div class="flex gap-2">
@@ -49,11 +50,13 @@
          ========================================== -->
     <main id="pageTracker" class="max-w-6xl mx-auto px-4 mt-6 space-y-6">
 
-        <!-- RECORD PERSONALI -->
+        <!-- RECORD PERSONALI + TARGET SALVATI -->
         <section>
-            <div class="flex justify-between items-center mb-2 px-1">
-                <h2 class="text-xs font-medium uppercase tracking-wider text-zinc-400">🏆 Record Personali & Valori in Carico</h2>
-                <span class="text-[11px] text-blue-400">Ponderati sulla fatica</span>
+            <div class="flex flex-wrap justify-between items-center mb-2 px-1 gap-2">
+                <h2 class="text-xs font-medium uppercase tracking-wider text-zinc-400">🏆 Record Personali, Valore da Ripetute & Target Fissati</h2>
+                <span class="text-[11px] text-purple-300 bg-purple-950/50 px-2.5 py-0.5 rounded-full border border-purple-500/30">
+                    Sconta automaticamente il ritmo conservativo delle ripetute (anche sulla #1)
+                </span>
             </div>
             <div id="pbContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3"></div>
         </section>
@@ -64,65 +67,84 @@
             <div class="lg:col-span-6 apple-card p-5">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-base font-semibold text-white flex items-center gap-2">
-                        <span id="formModeTitle">➕ Nuova Seduta</span>
+                        <span id="formModeTitle">➕ Registra Seduta</span>
                     </h2>
                     <div class="flex items-center gap-2">
                         <span id="liveVolumeBadge" class="text-xs font-mono bg-zinc-800 text-emerald-400 px-2.5 py-1 rounded-full border border-white/10">Vol: 0m</span>
-                        <button id="cancelEditBtn" onclick="resetFormToCreateMode()" class="hidden text-xs text-rose-400 hover:underline">Annulla modifica</button>
+                        <button id="cancelEditBtn" type="button" onclick="resetFormToCreateMode()" class="hidden text-xs text-rose-400 hover:underline">Annulla modifica</button>
                     </div>
                 </div>
 
                 <form id="workoutForm" class="space-y-4">
                     <input type="hidden" id="editingWorkoutId" value="">
                     
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                        <div>
-                            <label class="block text-xs text-zinc-400 mb-1">Data</label>
-                            <input type="date" id="date" required class="apple-input w-full p-2 text-sm">
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                        <div class="col-span-1">
+                            <label class="block text-[11px] text-zinc-400 mb-1">Data</label>
+                            <input type="date" id="date" required class="apple-input w-full p-2 text-xs">
                         </div>
-                        <div>
-                            <label class="block text-xs text-zinc-400 mb-1">Tipo Seduta</label>
-                            <select id="sessionType" class="apple-input w-full p-2 text-sm">
-                                <option value="ripetute">Ripetute / Piramidale</option>
-                                <option value="singola">Gara / Test</option>
-                                <option value="fondo">Fondo / Medio</option>
+                        <div class="col-span-1">
+                            <label class="block text-[11px] text-zinc-400 mb-1">Tipo Seduta</label>
+                            <select id="sessionType" onchange="handleSessionTypeUI()" class="apple-input w-full p-2 text-xs font-semibold">
+                                <option value="ripetute">🔄 Ripetute (Allenamento)</option>
+                                <option value="singola">🏁 Gara / Test Singolo</option>
+                                <option value="fondo">🏃 Fondo / Medio</option>
                             </select>
                         </div>
-                        <div class="col-span-2 sm:col-span-1">
-                            <label class="block text-xs text-zinc-400 mb-1">Fatica RPE (1-10)</label>
-                            <input type="number" id="rpe" min="1" max="10" value="8" required class="apple-input w-full p-2 text-sm font-bold text-amber-400">
+                        <div class="col-span-1">
+                            <label class="block text-[11px] text-zinc-400 mb-1" title="Nelle ripetute si parte più conservativi (es. 80-88%) per finire l'allenamento">Impegno iniziale</label>
+                            <select id="effortPreset" class="apple-input w-full p-2 text-xs text-purple-300 font-semibold">
+                                <option value="auto">🤖 Auto (da Volume/RPE)</option>
+                                <option value="0.80">🟢 ~80% (Conservativo)</option>
+                                <option value="0.85">🔵 ~85% (Ritmo Medio/Est.)</option>
+                                <option value="0.90">🟣 ~90% (Specifico Veloce)</option>
+                                <option value="0.95">🟠 ~95% (Lattacido Stretto)</option>
+                                <option value="1.00">🔴 100% (All-Out / Gara)</option>
+                            </select>
+                        </div>
+                        <div class="col-span-1">
+                            <label class="block text-[11px] text-zinc-400 mb-1">Fatica RPE (1-10)</label>
+                            <input type="number" id="rpe" min="1" max="10" value="8" required class="apple-input w-full p-2 text-xs font-bold text-amber-400 text-center">
                         </div>
                     </div>
 
-                    <!-- AGGIUNGI PROVE -->
+                    <!-- BANNER ESPLICATIVO DIFFERENZA GARA vs RIPETUTE -->
+                    <div id="sessionModeHint" class="text-[11px] bg-purple-950/40 text-purple-200 px-3 py-2 rounded-xl border border-purple-500/30">
+                        💡 <b>Modalità Ripetute attiva:</b> L'app sa che anche nella 1ª prova non corri al 100% come in una gara secca, ma gestisci le energie (es. 80-88%) in funzione del volume totale.
+                    </div>
+
+                    <!-- AGGIUNGI PROVE MULTIPLE / DISTANZE MISTE -->
                     <div class="bg-zinc-900/60 p-3.5 rounded-xl border border-white/10 space-y-2.5">
                         <div class="flex justify-between items-center">
-                            <span class="text-xs font-semibold text-blue-400 uppercase tracking-wider">⚡ Inserisci Prove / Serie</span>
+                            <span class="text-xs font-semibold text-blue-400 uppercase tracking-wider">⚡ Costruttore Serie (Anche Distanze Miste)</span>
                             <button type="button" onclick="clearAllRuns()" class="text-[11px] text-rose-400 hover:underline">Svuota lista</button>
                         </div>
 
                         <div class="grid grid-cols-12 gap-2 items-end pt-1">
                             <div class="col-span-3 sm:col-span-2">
-                                <label class="block text-[10px] text-zinc-400 mb-1">N°</label>
-                                <input type="number" id="builderCount" value="1" min="1" max="30" class="apple-input w-full p-2 text-sm font-bold text-center">
+                                <label class="block text-[10px] text-zinc-400 mb-1">N° Prove</label>
+                                <input type="number" id="builderCount" value="4" min="1" max="30" class="apple-input w-full p-2 text-sm font-bold text-center">
                             </div>
                             <div class="col-span-5 sm:col-span-4">
                                 <label class="block text-[10px] text-zinc-400 mb-1">Distanza</label>
                                 <select id="builderDistSelect" onchange="toggleBuilderCustomDist()" class="apple-input w-full p-2 text-xs">
-                                    <optgroup label="Sprint">
+                                    <optgroup label="Sprint / Pista">
                                         <option value="60">60 m</option>
-                                        <option value="100" selected>100 m</option>
+                                        <option value="80">80 m</option>
+                                        <option value="100">100 m</option>
                                         <option value="150">150 m</option>
-                                        <option value="200">200 m</option>
+                                        <option value="200" selected>200 m</option>
                                         <option value="300">300 m</option>
                                         <option value="400">400 m</option>
                                     </optgroup>
                                     <optgroup label="Mezzofondo / Fondo">
+                                        <option value="600">600 m</option>
                                         <option value="800">800 m</option>
                                         <option value="1000">1000 m</option>
                                         <option value="1500">1500 m</option>
-                                        <option value="5000">5 km</option>
-                                        <option value="10000">10 km</option>
+                                        <option value="3000">3000 m</option>
+                                        <option value="5000">5 km (5000m)</option>
+                                        <option value="10000">10 km (10000m)</option>
                                         <option value="custom">Altra (m)...</option>
                                     </optgroup>
                                 </select>
@@ -146,8 +168,8 @@
                     <!-- LISTA PROVE CON INTERTEMPI SI/NO -->
                     <div class="bg-zinc-900/40 p-3.5 rounded-xl border border-white/10 space-y-3">
                         <div class="flex justify-between items-center">
-                            <span class="text-xs font-semibold uppercase tracking-wider text-emerald-400">⏱️ Tempi & Intertempi</span>
-                            <span class="text-[11px] text-zinc-400">Formato: <code class="text-zinc-200">11.45</code> o <code class="text-zinc-200">3:45.2</code></span>
+                            <span class="text-xs font-semibold uppercase tracking-wider text-emerald-400">⏱️ Elenco Prove & Intertempi (Sì/No)</span>
+                            <span class="text-[11px] text-zinc-400">Es: <code class="text-zinc-200">24.30</code> o <code class="text-zinc-200">3:45.2</code></span>
                         </div>
                         <div id="runsListContainer" class="space-y-3 max-h-80 overflow-y-auto pr-1"></div>
                     </div>
@@ -156,20 +178,20 @@
                         <div>
                             <label class="block text-xs text-zinc-400 mb-1">Scarpe</label>
                             <select id="shoes" class="apple-input w-full p-2 text-xs">
-                                <option value="Chiodate">👟 Chiodate</option>
-                                <option value="Carbonio">🚀 Carbonio</option>
-                                <option value="A3/Allenamento">🏃 A3 Lento</option>
+                                <option value="Chiodate">👟 Chiodate da Pista</option>
+                                <option value="Carbonio">🚀 Carbonio / Gara</option>
+                                <option value="A3/Allenamento">🏃 A3 / Allenamento</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs text-zinc-400 mb-1">Vento / Clima</label>
+                            <label class="block text-xs text-zinc-400 mb-1">Vento / Condizioni</label>
                             <input type="text" id="wind" placeholder="es. +0.8 m/s" class="apple-input w-full p-2 text-xs">
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-xs text-zinc-400 mb-1">Note</label>
-                        <textarea id="notes" rows="2" placeholder="Sensazioni..." class="apple-input w-full p-2 text-sm"></textarea>
+                        <label class="block text-xs text-zinc-400 mb-1">Note sulla Seduta</label>
+                        <textarea id="notes" rows="2" placeholder="Sensazioni, tenuta nel finale, parziali..." class="apple-input w-full p-2 text-sm"></textarea>
                     </div>
 
                     <button type="submit" id="submitWorkoutBtn" class="apple-btn w-full py-3 text-sm shadow-xl shadow-blue-500/10">
@@ -178,26 +200,32 @@
                 </form>
             </div>
 
-            <!-- GRAFICO CON LINEA TARGET / PROJECTED TIME -->
+            <!-- GRAFICO STORICO CON TARGET PERSISTENTE SALVATO -->
             <div class="lg:col-span-6 apple-card p-5 flex flex-col justify-between">
                 <div>
                     <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
                         <div>
-                            <h2 class="text-base font-semibold text-white">📈 Grafico & Target (Projected Time)</h2>
-                            <p class="text-xs text-zinc-400">Confronta i tuoi tempi con l'obiettivo</p>
+                            <h2 class="text-base font-semibold text-white">📈 Evoluzione Tempi & Target Fissato</h2>
+                            <p class="text-xs text-zinc-400">Confronta Tempo Reale, Valore da Ripetute e il tuo Target salvato</p>
                         </div>
-                        <select id="chartFilter" onchange="updateChart()" class="apple-input p-2 text-sm font-medium"></select>
+                        <select id="chartFilter" onchange="onChartDistanceChange()" class="apple-input p-2 text-sm font-semibold text-blue-400"></select>
                     </div>
 
-                    <!-- CONTROLLI TARGET / PROJECTED TIME -->
-                    <div class="bg-zinc-900/80 p-3 rounded-xl border border-white/10 mb-3 flex flex-wrap items-center justify-between gap-3">
+                    <!-- BARRA SALVATAGGIO TARGET PERSISTENTE PER QUESTA DISTANZA -->
+                    <div class="bg-zinc-900/90 p-3 rounded-xl border border-amber-500/30 mb-3 flex flex-wrap items-center justify-between gap-2">
                         <div class="flex items-center gap-2">
-                            <input type="checkbox" id="showTargetLine" onchange="updateChart()" class="w-4 h-4 accent-blue-500 rounded">
-                            <label for="showTargetLine" class="text-xs text-zinc-200 font-medium cursor-pointer">Mostra Linea Target (Projected Time)</label>
+                            <span class="text-base">🎯</span>
+                            <div>
+                                <div class="text-xs font-semibold text-amber-400">Tempo Target (Salvato in Memoria)</div>
+                                <div id="targetStatusSubtext" class="text-[10px] text-zinc-400">Rimane fissato per questa distanza</div>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-[11px] text-zinc-400">Tempo Target:</span>
-                            <input type="text" id="targetTimeInput" placeholder="es. 11.50 o 25.00" onkeyup="updateChart()" class="apple-input w-28 p-1 text-xs font-mono text-center">
+                        <div class="flex items-center gap-1.5">
+                            <input type="text" id="targetTimeInput" placeholder="es. 24.00" class="apple-input w-24 p-1.5 text-xs font-mono text-center font-bold text-amber-300">
+                            <button type="button" onclick="saveCurrentTargetTime()" class="bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs px-3 py-1.5 rounded-lg transition">
+                                Fissa Target
+                            </button>
+                            <button type="button" onclick="clearCurrentTargetTime()" title="Rimuovi Target" class="text-zinc-400 hover:text-rose-400 text-xs px-1.5 py-1">✖</button>
                         </div>
                     </div>
 
@@ -206,29 +234,36 @@
                     </div>
                 </div>
 
-                <div class="mt-4 p-3 rounded-xl bg-zinc-900/60 border border-white/5 text-xs text-zinc-400 flex justify-between">
-                    <span>🔵 Tempo Reale / 🟣 Valore in Carico</span>
-                    <span class="text-amber-400 font-medium">⚡ Linea Tratteggiata Arancione = Target / Projected Time</span>
+                <div class="mt-4 p-3 rounded-xl bg-zinc-900/60 border border-white/5 text-[11px] text-zinc-400 space-y-1">
+                    <div class="flex flex-wrap justify-between gap-2 font-medium">
+                        <span class="text-blue-400">🔵 Crono Reale</span>
+                        <span class="text-emerald-400">🟢 Media Ripetute</span>
+                        <span class="text-purple-400">🟣 Valore Gara (Scontato del Ritmo Ripetute)</span>
+                        <span class="text-amber-400">🟠 Tuo Target Fissato</span>
+                    </div>
                 </div>
             </div>
 
         </div>
 
-        <!-- STORICO CON PULSANTE MODIFICA RAPIDA -->
+        <!-- STORICO SEDUTE CON MODIFICA RAPIDA -->
         <section class="apple-card p-5">
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-base font-semibold text-white">📋 Storico Sedute</h2>
+                <div>
+                    <h2 class="text-base font-semibold text-white">📋 Storico Sedute (Modifica Rapida ✏️)</h2>
+                    <p class="text-xs text-zinc-400">Mostra la differenza tra il crono fatto in ripetuta (es. all'82-88%) e quanto vale in Gara Singola</p>
+                </div>
                 <span id="totalWorkoutsBadge" class="text-xs bg-zinc-800 text-blue-400 px-2.5 py-1 rounded-full border border-white/10">0 sedute</span>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="border-b border-white/10 text-xs text-zinc-400 uppercase">
-                            <th class="py-3 px-2">Data</th>
-                            <th class="py-3 px-2">Carico & Volume</th>
-                            <th class="py-3 px-2">Dettaglio Prove & Intertempi</th>
+                            <th class="py-3 px-2">Data & Tipo</th>
+                            <th class="py-3 px-2">Carico & Impegno</th>
+                            <th class="py-3 px-2">Dettaglio Prove, Intertempi & Equivalente Gara Singola</th>
                             <th class="py-3 px-2">Note</th>
-                            <th class="py-3 px-2 text-right">Azioni</th>
+                            <th class="py-3 px-2 text-right">Modifica / Elimina</th>
                         </tr>
                     </thead>
                     <tbody id="workoutTableBody" class="divide-y divide-white/5 text-sm"></tbody>
@@ -239,27 +274,27 @@
     </main>
 
     <!-- ==========================================
-         PAGINA 2: LAB & STIME DI CARICO
+         PAGINA 2: LAB, STIME DA CARICO & MARGINI
          ========================================== -->
     <main id="pageLab" class="max-w-6xl mx-auto px-4 mt-6 space-y-6 hidden">
         <section class="apple-card p-6 bg-gradient-to-br from-zinc-900 to-zinc-950 border-blue-500/30">
             <div class="flex flex-col md:flex-row justify-between gap-4 items-start md:items-center">
                 <div>
-                    <span class="text-xs uppercase tracking-widest text-blue-400 font-semibold">🧬 Laboratorio Fisiologico</span>
+                    <span class="text-xs uppercase tracking-widest text-blue-400 font-semibold">🧬 Laboratorio Fisiologico & Differenziale Gara/Ripetute</span>
                     <h2 class="text-xl font-bold text-white mt-1" id="athleteProfileTitle">Analisi del Profilo...</h2>
                     <p class="text-sm text-zinc-300 mt-1 max-w-3xl" id="athleteProfileDesc"></p>
                 </div>
-                <div class="bg-black/60 p-3.5 rounded-xl border border-white/10 text-center min-w-[200px]">
-                    <div class="text-[11px] text-zinc-400 uppercase">Miglior Prestazione</div>
+                <div class="bg-black/60 p-3.5 rounded-xl border border-white/10 text-center min-w-[210px]">
+                    <div class="text-[11px] text-zinc-400 uppercase">Miglior Valore Assoluto</div>
                     <div class="text-lg font-bold text-amber-400 mt-0.5" id="bestEventBadge">-</div>
-                    <div class="text-xs text-blue-300 font-mono mt-0.5" id="bestScoreBadge">0 pt</div>
+                    <div class="text-xs text-purple-300 font-mono mt-0.5" id="bestScoreBadge">0 pt</div>
                 </div>
             </div>
 
             <div class="mt-5 pt-4 border-t border-white/10 grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-black/40 p-3 rounded-xl border border-white/10">
                     <div class="flex justify-between text-xs mb-1">
-                        <span class="text-zinc-400">⚡ Sprint (60-400m)</span>
+                        <span class="text-zinc-400">⚡ Velocità / Sprint (60-400m)</span>
                         <span id="sprintScoreText" class="font-bold text-blue-400">-</span>
                     </div>
                     <div class="w-full bg-zinc-800 h-2 rounded-full overflow-hidden">
@@ -277,7 +312,7 @@
                 </div>
                 <div class="bg-black/40 p-3 rounded-xl border border-white/10">
                     <div class="flex justify-between text-xs mb-1">
-                        <span class="text-zinc-400">🫀 Fondo (5k-42k)</span>
+                        <span class="text-zinc-400">🫀 Fondo Aerobico (5k-42k)</span>
                         <span id="longScoreText" class="font-bold text-purple-400">-</span>
                     </div>
                     <div class="w-full bg-zinc-800 h-2 rounded-full overflow-hidden">
@@ -288,18 +323,20 @@
         </section>
 
         <section class="apple-card p-5">
-            <h3 class="text-base font-semibold text-emerald-400 mb-1">🔮 Stima Tempi Potenziali & Margini</h3>
-            <p class="text-xs text-zinc-400 mb-4">Confronta il tuo crono reale con il valore dimostrato in carico e il potenziale stimato.</p>
+            <h3 class="text-base font-semibold text-emerald-400 mb-1">🔮 Stima Tempi in Gara Singola (Valutando Ripetute Conservative & Motore)</h3>
+            <p class="text-xs text-zinc-400 mb-4">
+                Confronta il tuo <b>PB Crono</b>, quanto vali già oggi in <b>Gara Singola</b> (scorporando il fatto che nelle ripetute corri all'80-90%), il tuo <b>Target Fissato</b> e il <b>Potenziale Massimale</b> sulle gambe.
+            </p>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="border-b border-white/10 text-xs text-zinc-400 uppercase">
                             <th class="py-3 px-2">Distanza</th>
                             <th class="py-3 px-2">PB Crono</th>
-                            <th class="py-3 px-2 text-blue-300">⚡ Valore in Carico</th>
-                            <th class="py-3 px-2 text-emerald-400">🎯 Potenziale</th>
-                            <th class="py-3 px-2">Margine</th>
-                            <th class="py-3 px-2">Diagnosi</th>
+                            <th class="py-3 px-2 text-purple-300">⚡ Valore Gara (da Ripetute)</th>
+                            <th class="py-3 px-2 text-amber-400">🎯 Tuo Target</th>
+                            <th class="py-3 px-2 text-emerald-400">🚀 Potenziale Motore</th>
+                            <th class="py-3 px-2">Diagnosi & Margine</th>
                         </tr>
                     </thead>
                     <tbody id="predictionsTableBody" class="divide-y divide-white/5 text-sm"></tbody>
@@ -309,24 +346,113 @@
     </main>
 
     <!-- ==========================================
-         PAGINA 3: ANALISI INTERTEMPI & VELOCITÀ NEI TRATTI
+         PAGINA 3: STRATEGIA NON-LINEARE, PASSAGGI & DOVE ROSICCHIARE TEMPO
          ========================================== -->
     <main id="pageSplits" class="max-w-6xl mx-auto px-4 mt-6 space-y-6 hidden">
-        <section class="apple-card p-5">
-            <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
+
+        <!-- PANNELLO CONTROLLO STRATEGIA DI GARA E TARGET -->
+        <section class="apple-card p-5 border-amber-500/30">
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-5">
                 <div>
-                    <h2 class="text-base font-semibold text-white">⚡ Analisi Avanzata Intertempi e Tratti</h2>
-                    <p class="text-xs text-zinc-400">Seleziona una prova registrata con intertempi per analizzare la velocità nei singoli segmenti</p>
+                    <span class="text-xs uppercase tracking-widest text-amber-400 font-bold">⚡ Strategia Biomeccanica Non-Lineare</span>
+                    <h2 class="text-lg font-bold text-white mt-0.5">Analisi Fasi di Gara: Dove Rosicchiare Tempo & Passaggi Ideali</h2>
+                    <p class="text-xs text-zinc-400 mt-0.5">
+                        Le gare non sono lineari (partenza dai blocchi, fase lanciata, controllo centrale e spinta finale). Seleziona una tua prova con intertempi e fissa il tuo <b>Target Time</b> per scoprire a quanto devi passare in ogni frazione e dove puoi limare più facilmente i decimi!
+                    </p>
                 </div>
-                <select id="splitSessionSelect" onchange="renderSplitAnalysisDetails()" class="apple-input p-2 text-sm font-medium">
-                    <!-- Popolato via JS -->
-                </select>
+
+                <!-- BOX TARGET CONDIVISO NELLA PAGINA 3 -->
+                <div class="bg-zinc-900/90 p-3 rounded-xl border border-amber-500/40 flex items-center gap-2 self-stretch lg:self-auto">
+                    <div>
+                        <label class="block text-[10px] text-amber-400 font-bold uppercase">🎯 Target su questa distanza</label>
+                        <div class="flex items-center gap-1.5 mt-1">
+                            <input type="text" id="splitPageTargetInput" placeholder="es. 24.00" class="apple-input w-24 p-1.5 text-sm font-mono font-bold text-amber-300 text-center">
+                            <button type="button" onclick="saveTargetFromSplitPage()" class="bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs px-3 py-1.5 rounded-lg transition">
+                                Salva Target
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div id="splitAnalysisContent" class="space-y-4">
-                <!-- Dettagli dinamici dei segmenti -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center bg-black/40 p-3.5 rounded-xl border border-white/10">
+                <div class="md:col-span-7">
+                    <label class="block text-xs text-zinc-400 mb-1">1. Seleziona una tua prova registrata con Intertempi (Sì):</label>
+                    <select id="splitSessionSelect" onchange="onSplitRunChange()" class="apple-input w-full p-2.5 text-sm font-medium text-white"></select>
+                </div>
+                <div class="md:col-span-5">
+                    <label class="block text-xs text-zinc-400 mb-1">Oppure simula i passaggi ottimali per qualsiasi distanza:</label>
+                    <select id="splitSimDistSelect" onchange="onSimDistChange()" class="apple-input w-full p-2.5 text-sm text-blue-300 font-medium">
+                        <option value="">-- Usa la prova selezionata a sinistra --</option>
+                        <option value="100">Simula Strategia 100m (Passaggi 30m, 60m, 100m)</option>
+                        <option value="200">Simula Strategia 200m (Passaggi 50m, 100m, 150m, 200m)</option>
+                        <option value="400">Simula Strategia 400m (Passaggi 100m, 200m, 300m, 400m)</option>
+                        <option value="800">Simula Strategia 800m (Passaggi ogni 200m)</option>
+                        <option value="1500">Simula Strategia 1500m (Passaggi 300m, 700m, 1100m, 1500m)</option>
+                        <option value="5000">Simula Strategia 5000m (Passaggi ogni 1000m)</option>
+                    </select>
+                </div>
             </div>
         </section>
+
+        <!-- GRAFICO DOPPIO: CURVA DI VELOCITÀ NEI TRATTI + BOX "DOVE ROSICCHIARE TEMPO" -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div class="lg:col-span-7 apple-card p-5 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-base font-semibold text-white">📊 Curva Non-Lineare di Gara: Tua Velocità vs Modello Target</h3>
+                    <p class="text-xs text-zinc-400 mb-3">
+                        Confronta la tua velocità (m/s) in ogni tratto con la distribuzione ideale per centrare il tuo Target Time
+                    </p>
+                    <div class="relative h-72 w-full">
+                        <canvas id="splitPacingChart"></canvas>
+                    </div>
+                </div>
+                <div class="mt-3 pt-2 border-t border-white/10 flex flex-wrap justify-between text-[11px] text-zinc-400">
+                    <span class="text-blue-400">🔵 Tua Curva di Velocità nei Tratti</span>
+                    <span class="text-amber-400">🟠 Curva Ottimale Non-Lineare (Per fare il Target)</span>
+                </div>
+            </div>
+
+            <!-- DIAGNOSI AI: IN QUALE FASE ROSICCHIARE TEMPO -->
+            <div class="lg:col-span-5 apple-card p-5 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="text-xl">🧠</span>
+                        <div>
+                            <h3 class="text-base font-semibold text-emerald-400">Dove Rosicchiare il Tempo</h3>
+                            <p class="text-xs text-zinc-400">Analisi biomeccanica dei tuoi passaggi</p>
+                        </div>
+                    </div>
+                    <div id="coachAdviceContainer" class="space-y-3">
+                        <!-- Popolato dinamicamente -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABELLA DETTAGLIATA DI OGNI PASSAGGIO / INTERTEMPO -->
+        <section class="apple-card p-5">
+            <h3 class="text-base font-semibold text-white mb-1">⏱️ Tabella di Marcia Non-Lineare (Passaggi & Frazioni)</h3>
+            <p class="text-xs text-zinc-400 mb-4">
+                Ecco esattamente **a quanto devi passare ad ogni intertempo** (e a che velocità correre ogni singolo tratto) rispetto a quanto hai fatto nella prova selezionata.
+            </p>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-white/10 text-xs text-zinc-400 uppercase">
+                            <th class="py-3 px-2">Fase / Tratto</th>
+                            <th class="py-3 px-2">Passaggio Reale</th>
+                            <th class="py-3 px-2 text-amber-400">🎯 Passaggio Target Ideale</th>
+                            <th class="py-3 px-2">Parziale Tratto (Tuo vs Target)</th>
+                            <th class="py-3 px-2">Velocità Tratto</th>
+                            <th class="py-3 px-2">Azione Consigliata nel Tratto</th>
+                        </tr>
+                    </thead>
+                    <tbody id="splitTableBody" class="divide-y divide-white/5 text-sm"></tbody>
+                </table>
+            </div>
+        </section>
+
     </main>
 
     <!-- BARRA DI NAVIGAZIONE INFERIORE (APPLE TAB BAR) -->
@@ -334,22 +460,22 @@
         <div class="max-w-md mx-auto grid grid-cols-3">
             <button id="navBtnTracker" onclick="switchPage('tracker')" class="flex flex-col items-center py-2.5 text-xs font-semibold transition nav-active">
                 <span class="text-lg">⏱️</span>
-                <span>Diario</span>
+                <span>Diario & Target</span>
             </button>
             <button id="navBtnLab" onclick="switchPage('lab')" class="flex flex-col items-center py-2.5 text-xs font-semibold text-zinc-400 hover:text-white transition">
                 <span class="text-lg">🧬</span>
-                <span>Lab Stime</span>
+                <span>Lab & Stime</span>
             </button>
             <button id="navBtnSplits" onclick="switchPage('splits')" class="flex flex-col items-center py-2.5 text-xs font-semibold text-zinc-400 hover:text-white transition">
                 <span class="text-lg">⚡</span>
-                <span>Intertempi</span>
+                <span>Strategia & Intertempi</span>
             </button>
         </div>
     </nav>
 
     <script>
         // =========================================================================
-        // STANDARD FISIOLOGICI & STATO
+        // 1. STANDARD FISIOLOGICI & STORAGE PERSISTENTE (ALLENAMENTI + TARGETS)
         // =========================================================================
         const ATHLETIC_STANDARDS = [
             { dist: 60,    label: "60 m",           cat: "sprint", t500: 8.15,    t800: 7.12,   optRecSec: 300 },
@@ -366,12 +492,203 @@
             { dist: 10000, label: "10 km",          cat: "long",   t500: 2550.0,  t800: 1950.0, optRecSec: 600 }
         ];
 
-        let workouts = JSON.parse(localStorage.getItem('athletrack_workouts_v4')) || [];
+        let workouts = JSON.parse(localStorage.getItem('athletrack_workouts_v5')) || [];
+        // Mappa persistente dei Target Time per ogni distanza: es. { "100": 11.80, "200": 24.00, "400": 54.00 }
+        let targetTimesMap = JSON.parse(localStorage.getItem('athletrack_targets_v5')) || {};
+
         let chartInstance = null;
+        let splitChartInstance = null;
         let runRowCounter = 0;
 
         document.getElementById('date').valueAsDate = new Date();
 
+        function saveTargetsToStorage() {
+            localStorage.setItem('athletrack_targets_v5', JSON.stringify(targetTimesMap));
+        }
+
+        // =========================================================================
+        // 2. MODELLO BIOMECCANICO NON-LINEARE DELLE FASI DI GARA
+        // =========================================================================
+        /**
+         * Calcola il peso relativo (tempo speso per unità di distanza) e il nome della fase biomeccanica
+         * per qualsiasi frazione [dStart -> dEnd] su una distanza di gara totale `totalDist`.
+         * Restituisce un profilo fedele alla fisiologia dell'atletica leggera:
+         * - 60m/100m: Reazione + Accelerazione dai blocchi (più lenta) -> Picco Lanciato (30-70m) -> Tenuta Velocità
+         * - 200m: Accelerazione in curva (0-50m) -> Lanciato curva/rettilineo (50-150m) -> Tenuta Lattacida (150-200m)
+         * - 400m: Accelerazione (0-100m) -> Fase di Controllo/Float (100-200m) -> Attacco Curva (200-300m) -> Resistenza Lattacida (300-400m)
+         * - 800m+: Avvio tattico -> Controllo aerobico centrale -> Progressione / Volata finale
+         */
+        function getBiomechanicalPointWeight(totalDist, relPos) {
+            // relPos è tra 0.0 (partenza) e 1.0 (traguardo)
+            if (totalDist <= 120) {
+                // Sprint Puro (60m - 100m): i primi 25m scontano il tempo di reazione e l'inerzia dai blocchi
+                if (relPos < 0.25) return 1.24 - (relPos / 0.25) * 0.30; // Scende da 1.24 a 0.94
+                if (relPos < 0.70) return 0.92; // Picco di velocità massima (Fly zone)
+                return 0.93 + ((relPos - 0.70) / 0.30) * 0.07; // Leggera perdita neuromuscolare nel finale
+            } else if (totalDist <= 250) {
+                // 150m - 200m: primi 50m partenza dai blocchi in curva, 50-140m lanciato veloce, 140-200m tenuta
+                if (relPos < 0.22) return 1.15 - (relPos / 0.22) * 0.20;
+                if (relPos < 0.72) return 0.94; // Fase lanciata centrale velocissima
+                return 0.96 + ((relPos - 0.72) / 0.28) * 0.10; // Decadimento lattacido negli ultimi 50m
+            } else if (totalDist <= 500) {
+                // 300m - 400m: 0-25% lanciato, 25-55% controllo decontratto (float), 55-80% spinta in curva, 80-100% acido lattico
+                if (relPos < 0.15) return 1.06; // Partenza dai blocchi + accelerazione
+                if (relPos < 0.30) return 0.92; // Lanciato fine primo 100m
+                if (relPos < 0.55) return 0.95; // Controllo / Galleggiamento sul rettilineo opposto
+                if (relPos < 0.78) return 1.00; // Distribuzione sforzo in seconda curva
+                return 1.09; // Ultimi 80-100m in acido lattico
+            } else if (totalDist <= 1200) {
+                // 800m - 1000m: primo giro leggermente più veloce (48.5%), terzo 200m critico, ultimo 200m spinta
+                if (relPos < 0.25) return 0.96; // Primi 200m brillanti
+                if (relPos < 0.50) return 0.99; // Passaggio ai 400m in controllo (~48.7% del totale)
+                if (relPos < 0.78) return 1.035; // Fase centrale di gestione mentale/fisiologica
+                return 1.01; // Volata finale
+            } else {
+                // 1500m - 10000m: avvio brillante, gestione centrale costante in controllo, volata finale (negative/kick)
+                if (relPos < 0.20) return 0.99;
+                if (relPos < 0.80) return 1.015; // Fase centrale in controllo aerobico
+                return 0.965; // Cambio di ritmo e volata finale
+            }
+        }
+
+        function getPhaseDescription(totalDist, dStart, dEnd) {
+            const midPos = ((dStart + dEnd) / 2) / totalDist;
+            if (totalDist <= 120) {
+                if (midPos < 0.35) return { name: "🚀 Messa in Moto & Accelerazione", tip: "Spinta esplosiva sui blocchi e angoli bassi" };
+                if (midPos < 0.72) return { name: "⚡ Picco Velocità Massima (Fly)", tip: "Frequenza rimbalzo elastico e decontrazione spalle" };
+                return { name: "🔥 Tenuta Velocità Massimale", tip: "Non irrigidire il collo, mantieni ampiezza e frequenza" };
+            } else if (totalDist <= 250) {
+                if (midPos < 0.30) return { name: "🚀 Accelerazione in Curva", tip: "Aggredisci la curva nei primi 50-60m" };
+                if (midPos < 0.72) return { name: "⚡ Lanciato & Uscita Curva", tip: "Sfrutta l'inerzia in decontrazione (fase più veloce)" };
+                return { name: "🛡️ Resistenza alla Velocità", tip: "Contrasta il calo lattacido con azione braccia-ginocchia" };
+            } else if (totalDist <= 500) {
+                if (midPos < 0.28) return { name: "🚀 Lanciato Iniziale", tip: "Veloce ma senza strappare nei primi 100m" };
+                if (midPos < 0.55) return { name: "🧘 Fase di Controllo (Float)", tip: "Scorri decontratto a velocità di crociera per risparmiare energie" };
+                if (midPos < 0.78) return { name: "⚙️ Rilancio in Curva", tip: "Riattiva frequenza e braccia quando sale la fatica" };
+                return { name: "🔥 Chiusura Lattacida", tip: "Massima tenuta di assetto fino al traguardo" };
+            } else {
+                if (midPos < 0.28) return { name: "🏁 Avvio & Posizionamento", tip: "Prendi il ritmo senza andare fuori giri" };
+                if (midPos < 0.76) return { name: "🧘 Fase Centrale in Controllo", tip: "Economia di corsa, respirazione regolare e passo costante" };
+                return { name: "🚀 Progressione & Volata Finale", tip: "Aumenta la frequenza e scarica tutto negli ultimi metri" };
+            }
+        }
+
+        // Restituisce i tempi ideali cumulati e di frazione per una lista di distanze di passaggio [d1, d2, ..., totalDist]
+        function computeNonLinearTargetSplits(totalDist, splitDistances, targetTotalSec) {
+            const steps = 200;
+            const stepMeters = totalDist / steps;
+            const cumulativeWeights = [0];
+            let totalWeight = 0;
+
+            for (let i = 1; i <= steps; i++) {
+                const relPos = (i - 0.5) / steps;
+                const w = getBiomechanicalPointWeight(totalDist, relPos);
+                totalWeight += w * stepMeters;
+                cumulativeWeights.push(totalWeight);
+            }
+
+            // Funzione che interpola la frazione di tempo cumulato alla distanza d
+            const getCumTimeAt = (d) => {
+                if (d <= 0) return 0;
+                if (d >= totalDist) return targetTotalSec;
+                const exactIdx = (d / totalDist) * steps;
+                const idxLow = Math.floor(exactIdx);
+                const idxHigh = Math.min(steps, idxLow + 1);
+                const frac = exactIdx - idxLow;
+                const wAtD = cumulativeWeights[idxLow] + frac * (cumulativeWeights[idxHigh] - cumulativeWeights[idxLow]);
+                return targetTotalSec * (wAtD / totalWeight);
+            };
+
+            let prevDist = 0;
+            let prevIdealTime = 0;
+            return splitDistances.map(d => {
+                const idealCumTime = getCumTimeAt(d);
+                const idealSegTime = idealCumTime - prevIdealTime;
+                const segDist = d - prevDist;
+                const phase = getPhaseDescription(totalDist, prevDist, d);
+                const res = {
+                    startDist: prevDist,
+                    endDist: d,
+                    segDist: segDist,
+                    idealCumTime: idealCumTime,
+                    idealSegTime: idealSegTime,
+                    idealSegSpeedMs: segDist / idealSegTime,
+                    phaseName: phase.name,
+                    phaseTip: phase.tip
+                };
+                prevDist = d;
+                prevIdealTime = idealCumTime;
+                return res;
+            });
+        }
+
+        // =========================================================================
+        // 3. MOTORE DIFFERENZIALE: RIPETUTE (CONSERVATIVE FIN DALLA #1) vs GARA SINGOLA
+        // =========================================================================
+        function evaluateSessionLoad(runs, rpe = 8, sessionType = 'ripetute', effortPreset = 'auto') {
+            let cumMeters = 0;
+            const totalM = runs.reduce((a, r) => a + r.distance, 0);
+            const totalReps = runs.length;
+            const rpeNum = parseFloat(rpe) || 8;
+            let totalLoad = 0;
+
+            const evaluated = runs.map((run, idx) => {
+                const std = getStandardForDistance(run.distance);
+                const recSec = parseRecoveryToSeconds(run.recovery);
+                const recDensity = Math.min(2.2, Math.max(0.65, Math.pow(std.optRecSec / Math.max(30, recSec), 0.35)));
+
+                // Quante prove equivalenti dobbiamo fare in totale in questa seduta?
+                const totalEquivalentRepsInSession = totalM / run.distance;
+                const priorEquivalentReps = cumMeters / run.distance;
+
+                // 1. RISERVA CONSERVATIVA DI SEDUTA (attiva ANCHE SULLA PRIMA PROVA se è un allenamento di ripetute o fondo!)
+                // Perché sapendo di dover fare tante prove, l'atleta corre all'80%-90% e non al 100% massimale!
+                let baseConservativeReservePct = 0;
+                if (effortPreset !== 'auto') {
+                    const chosenEffort = parseFloat(effortPreset) || 1.0;
+                    baseConservativeReservePct = Math.max(0, 1.0 - chosenEffort);
+                } else {
+                    if (sessionType === 'ripetute' || totalReps > 1) {
+                        // Più il volume totale della seduta è alto e il recupero è stretto, più si parte conservativi fin dalla prova #1
+                        const volumeConservatism = Math.min(0.11, Math.log1p(totalEquivalentRepsInSession) * 0.032 * Math.pow(recDensity, 0.4));
+                        const rpeMargin = Math.max(0, (10 - rpeNum) * 0.014);
+                        baseConservativeReservePct = Math.min(0.16, volumeConservatism + rpeMargin);
+                    } else if (sessionType === 'fondo') {
+                        baseConservativeReservePct = Math.max(0.03, (10 - rpeNum) * 0.018);
+                    } else {
+                        // Gara o Test Singolo: impegno ~99-100%, conta solo se RPE < 9.5
+                        baseConservativeReservePct = rpeNum < 9.5 ? (9.5 - rpeNum) * 0.008 : 0;
+                    }
+                }
+
+                // 2. FATICA PROGRESSIVA ACCUMULATA DALLE PROVE PRECEDENTI
+                const cumulativeFatiguePct = totalReps > 1
+                    ? Math.min(0.09, priorEquivalentReps * 0.0095 * recDensity)
+                    : 0;
+
+                // Scarto totale rispetto a una Gara Singola da fresco al 100%
+                const totalAdjustmentRatio = Math.min(0.22, baseConservativeReservePct + cumulativeFatiguePct);
+                const freshSingleRaceSec = run.timeSec * (1 - totalAdjustmentRatio);
+                const estimatedEffortPct = Math.round((1 - baseConservativeReservePct) * 100);
+
+                const rawScore = calculateScoreForTime(run.distance, run.timeSec);
+                totalLoad += (rawScore / 10) * Math.pow(run.distance / 100, 0.35) * (totalReps > 1 ? recDensity : 1) * (rpeNum / 8);
+                cumMeters += run.distance;
+
+                return {
+                    ...run,
+                    freshEquivalentSec: freshSingleRaceSec,
+                    estimatedEffortPct: estimatedEffortPct,
+                    fatigueBonusPct: (totalAdjustmentRatio * 100).toFixed(1)
+                };
+            });
+
+            return { runs: evaluated, totalVolume: totalM, trackLoad: Math.round(totalLoad) };
+        }
+
+        // =========================================================================
+        // 4. NAVIGAZIONE E GESTIONE UI DEL FORM
+        // =========================================================================
         function switchPage(page) {
             const p1 = document.getElementById('pageTracker');
             const p2 = document.getElementById('pageLab');
@@ -399,9 +716,27 @@
             }
         }
 
-        // =========================================================================
-        // COSTRUTTORE PROVE CON INTERTEMPI SI/NO
-        // =========================================================================
+        function handleSessionTypeUI() {
+            const type = document.getElementById('sessionType').value;
+            const hint = document.getElementById('sessionModeHint');
+            const preset = document.getElementById('effortPreset');
+
+            if (type === 'singola') {
+                hint.className = "text-[11px] bg-blue-950/40 text-blue-200 px-3 py-2 rounded-xl border border-blue-500/30";
+                hint.innerHTML = "🏁 <b>Modalità Gara / Test Singolo:</b> L'app valuta la prova come corsa al ~100% dell'impegno massimale da fresco.";
+                preset.value = "1.00";
+                document.getElementById('builderCount').value = 1;
+            } else if (type === 'ripetute') {
+                hint.className = "text-[11px] bg-purple-950/40 text-purple-200 px-3 py-2 rounded-xl border border-purple-500/30";
+                hint.innerHTML = "💡 <b>Modalità Ripetute attiva:</b> L'app calcola che anche nella 1ª ripetuta corri più conservativo (es. 80-88%) per gestire il volume della seduta.";
+                preset.value = "auto";
+            } else {
+                hint.className = "text-[11px] bg-emerald-950/40 text-emerald-200 px-3 py-2 rounded-xl border border-emerald-500/30";
+                hint.innerHTML = "🏃 <b>Modalità Fondo / Medio:</b> L'app compensa il margine aerobico rispetto a una gara tirata al limite.";
+                preset.value = "auto";
+            }
+        }
+
         function toggleBuilderCustomDist() {
             const val = document.getElementById('builderDistSelect').value;
             document.getElementById('builderCustomDistDiv').classList.toggle('hidden', val !== 'custom');
@@ -418,7 +753,7 @@
             updateLiveVolumeBadge();
         }
 
-        function appendRunRow(dist = 100, timeVal = '', recVal = '2\'30"', hasSplits = false, splits = []) {
+        function appendRunRow(dist = 200, timeVal = '', recVal = '2\'30"', hasSplits = false, splits = []) {
             runRowCounter++;
             const rowId = runRowCounter;
             const container = document.getElementById('runsListContainer');
@@ -434,26 +769,26 @@
                         <input type="number" value="${dist}" required min="10" onchange="updateLiveVolumeBadge()" class="apple-input run-dist-input w-20 p-1.5 text-xs font-bold text-blue-300 text-center font-mono">
                         <span class="text-xs text-zinc-400">m</span>
                     </div>
-                    <input type="text" required placeholder="Tempo (es. 11.45)" value="${timeVal}" class="apple-input run-time-input flex-1 min-w-[110px] p-1.5 text-sm font-mono">
+                    <input type="text" required placeholder="Tempo (es. 24.80)" value="${timeVal}" class="apple-input run-time-input flex-1 min-w-[110px] p-1.5 text-sm font-mono">
                     <input type="text" placeholder="Recupero" value="${recVal}" class="apple-input run-rec-input w-24 p-1.5 text-xs text-zinc-300">
                     <button type="button" onclick="removeRunRow(this)" class="text-rose-400 text-xs px-2 py-1">✖</button>
                 </div>
 
                 <div class="flex items-center justify-between pt-1 border-t border-white/5 text-xs">
-                    <span class="text-zinc-400 font-medium">Vuoi inserire intertempi per questa prova?</span>
+                    <span class="text-zinc-400 font-medium">Inserire intertempi per questa prova?</span>
                     <div class="flex gap-2">
-                        <label class="cursor-pointer px-2.5 py-1 rounded-lg bg-zinc-800 text-zinc-300 font-semibold transition split-toggle-btn border border-white/10">
-                            <input type="radio" name="splitRadio_${rowId}" value="no" ${!hasSplits ? 'checked' : ''} onchange="toggleSplitMode(${rowId}, false)" class="hidden"> No
+                        <label class="cursor-pointer px-2.5 py-0.5 rounded-lg bg-zinc-800 text-zinc-300 font-semibold transition border border-white/10">
+                            <input type="radio" name="splitRadio_${rowId}" value="no" ${!hasSplits ? 'checked' : ''} onchange="toggleSplitMode(${rowId}, false)"> No
                         </label>
-                        <label class="cursor-pointer px-2.5 py-1 rounded-lg bg-zinc-800 text-zinc-300 font-semibold transition split-toggle-btn border border-white/10">
-                            <input type="radio" name="splitRadio_${rowId}" value="yes" ${hasSplits ? 'checked' : ''} onchange="toggleSplitMode(${rowId}, true)" class="hidden"> Sì
+                        <label class="cursor-pointer px-2.5 py-0.5 rounded-lg bg-zinc-800 text-blue-300 font-semibold transition border border-white/10">
+                            <input type="radio" name="splitRadio_${rowId}" value="yes" ${hasSplits ? 'checked' : ''} onchange="toggleSplitMode(${rowId}, true)"> Sì
                         </label>
                     </div>
                 </div>
 
                 <div id="splitsContainer_${rowId}" class="space-y-1.5 pl-3 border-l-2 border-blue-500/50 ${hasSplits ? '' : 'hidden'}">
                     <div class="flex justify-between items-center pt-1">
-                        <span class="text-[11px] text-blue-400 font-medium">Passaggi intermedi</span>
+                        <span class="text-[11px] text-blue-400 font-medium">Passaggi intermedi (es. 50m, 100m, 150m)</span>
                         <button type="button" onclick="addSplitRow(${rowId})" class="text-[11px] bg-zinc-800 text-blue-300 px-2 py-0.5 rounded border border-white/10">+ Aggiungi passaggio</button>
                     </div>
                     <div id="splitRowsList_${rowId}" class="space-y-1.5"></div>
@@ -482,10 +817,10 @@
             const row = document.createElement('div');
             row.className = 'split-row flex items-center gap-2 pt-1';
             row.innerHTML = `
-                <span class="text-[11px] text-zinc-400">↳ A metri</span>
-                <input type="number" placeholder="es. 60" value="${defaultDist}" required class="apple-input split-dist w-24 p-1 text-xs font-mono">
+                <span class="text-[11px] text-zinc-400">↳ Passaggio a</span>
+                <input type="number" placeholder="metri (es. 100)" value="${defaultDist}" required class="apple-input split-dist w-24 p-1 text-xs font-mono">
                 <span class="text-[11px] text-zinc-400">in</span>
-                <input type="text" placeholder="tempo (es. 7.20)" value="${defaultTime}" required class="apple-input split-time flex-1 p-1 text-xs font-mono">
+                <input type="text" placeholder="tempo (es. 12.30)" value="${defaultTime}" required class="apple-input split-time flex-1 p-1 text-xs font-mono">
                 <button type="button" onclick="this.parentElement.remove()" class="text-rose-400 text-xs px-1">✖</button>
             `;
             list.appendChild(row);
@@ -499,7 +834,7 @@
 
         function clearAllRuns() {
             document.getElementById('runsListContainer').innerHTML = '';
-            appendRunRow(100, '', '2\'30"', false, []);
+            appendRunRow(200, '', '2\'30"', false, []);
         }
 
         function renumberRunRows() {
@@ -508,12 +843,13 @@
 
         function updateLiveVolumeBadge() {
             let total = 0;
-            document.querySelectorAll('.run-row-block').forEach(b => { total += parseInt(b.querySelector('.run-dist-input')?.value, 10) || 0; });
-            document.getElementById('liveVolumeBadge').textContent = `Vol: ${total}m`;
+            const blocks = document.querySelectorAll('.run-row-block');
+            blocks.forEach(b => { total += parseInt(b.querySelector('.run-dist-input')?.value, 10) || 0; });
+            document.getElementById('liveVolumeBadge').textContent = `${blocks.length} prove • Vol: ${total}m`;
         }
 
         // =========================================================================
-        // PARSER & MODELLO CARICO
+        // 5. PARSER E UTILITÀ MATEMATICHE
         // =========================================================================
         function parseTimeToSeconds(str) {
             if (!str) return null;
@@ -537,13 +873,15 @@
 
         function formatSeconds(sec, distance = 100) {
             if (sec === null || sec === undefined || isNaN(sec)) return '-';
-            if (distance <= 400 && sec < 60) return sec.toFixed(2) + 's';
+            const sign = sec < 0 ? '-' : '';
+            sec = Math.abs(sec);
+            if (distance <= 400 && sec < 60) return sign + sec.toFixed(2) + 's';
             const hrs = Math.floor(sec / 3600);
             const mins = Math.floor((sec % 3600) / 60);
             const remSec = sec % 60;
-            if (hrs > 0) return `${hrs}:${String(mins).padStart(2, '0')}:${Math.round(remSec).toString().padStart(2, '0')}`;
-            if (distance <= 3000) return `${mins}:${remSec.toFixed(2).padStart(5, '0')}`;
-            return `${mins}:${Math.round(remSec).toString().padStart(2, '0')}`;
+            if (hrs > 0) return `${sign}${hrs}:${String(mins).padStart(2, '0')}:${Math.round(remSec).toString().padStart(2, '0')}`;
+            if (distance <= 3000) return `${sign}${mins}:${remSec.toFixed(2).padStart(5, '0')}`;
+            return `${sign}${mins}:${Math.round(remSec).toString().padStart(2, '0')}`;
         }
 
         function formatDistanceLabel(m) {
@@ -581,31 +919,8 @@
             return std.t500 * Math.pow(500 / score, 1 / k);
         }
 
-        function evaluateSessionLoad(runs, rpe = 8) {
-            let cumMeters = 0;
-            const totalM = runs.reduce((a, r) => a + r.distance, 0);
-            let totalLoad = 0;
-
-            const evaluated = runs.map((run) => {
-                const std = getStandardForDistance(run.distance);
-                const recSec = parseRecoveryToSeconds(run.recovery);
-                const recDensity = Math.min(2.2, Math.max(0.65, Math.pow(std.optRecSec / Math.max(30, recSec), 0.35)));
-                const priorReps = cumMeters / run.distance;
-                const rpeNum = parseFloat(rpe) || 8;
-                
-                let fatiguePct = runs.length > 1 ? Math.min(0.11, priorReps * 0.011 * recDensity) : 0;
-                let freshEq = run.timeSec * (1 - fatiguePct);
-                
-                totalLoad += (calculateScoreForTime(run.distance, run.timeSec) / 10) * (rpeNum / 8);
-                cumMeters += run.distance;
-                return { ...run, freshEquivalentSec: freshEq, fatigueBonusPct: (fatiguePct * 100).toFixed(1) };
-            });
-
-            return { runs: evaluated, totalVolume: totalM, trackLoad: Math.round(totalLoad) };
-        }
-
         // =========================================================================
-        // SALVATAGGIO & MODIFICA RAPIDA DALLO STORICO
+        // 6. SALVATAGGIO E MODIFICA SEDUTE
         // =========================================================================
         document.getElementById('workoutForm').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -619,30 +934,35 @@
                 const timeSec = parseTimeToSeconds(b.querySelector('.run-time-input').value);
                 const rec = b.querySelector('.run-rec-input').value.trim();
 
-                if (!dist || dist <= 0 || !timeSec) { alert(`Controlla la prova #${i + 1}`); return; }
+                if (!dist || dist <= 0 || !timeSec) { alert(`Controlla formato tempo nella prova #${i + 1}`); return; }
 
                 const splits = [];
-                b.querySelectorAll('.split-row').forEach(s => {
-                    const sd = parseInt(s.querySelector('.split-dist').value, 10);
-                    const st = parseTimeToSeconds(s.querySelector('.split-time').value);
-                    if (sd && st) splits.push({ dist: sd, timeSec: st });
-                });
-                splits.sort((a, b) => a.dist - b.dist);
+                const isSplitYes = b.querySelector(`input[type="radio"][value="yes"]`)?.checked;
+                if (isSplitYes) {
+                    b.querySelectorAll('.split-row').forEach(s => {
+                        const sd = parseInt(s.querySelector('.split-dist').value, 10);
+                        const st = parseTimeToSeconds(s.querySelector('.split-time').value);
+                        if (sd && st && sd < dist) splits.push({ dist: sd, timeSec: st });
+                    });
+                    splits.sort((a, b) => a.dist - b.dist);
+                }
 
                 rawRuns.push({ repNumber: i + 1, distance: dist, timeSec: timeSec, recovery: rec, splits: splits });
             }
 
             const rpeVal = document.getElementById('rpe').value;
-            const evalRes = evaluateSessionLoad(rawRuns, rpeVal);
+            const sessionType = document.getElementById('sessionType').value;
+            const effortPreset = document.getElementById('effortPreset').value;
+            const evalRes = evaluateSessionLoad(rawRuns, rpeVal, sessionType, effortPreset);
 
             if (editingId) {
-                // Modifica esistente senza cancellare
                 workouts = workouts.map(w => {
                     if (w.id == editingId) {
                         return {
                             ...w,
                             date: document.getElementById('date').value,
-                            sessionType: document.getElementById('sessionType').value,
+                            sessionType: sessionType,
+                            effortPreset: effortPreset,
                             rpe: rpeVal,
                             shoes: document.getElementById('shoes').value,
                             wind: document.getElementById('wind').value,
@@ -656,11 +976,11 @@
                 });
                 resetFormToCreateMode();
             } else {
-                // Nuova seduta
-                const newW = {
+                workouts.push({
                     id: Date.now(),
                     date: document.getElementById('date').value,
-                    sessionType: document.getElementById('sessionType').value,
+                    sessionType: sessionType,
+                    effortPreset: effortPreset,
                     rpe: rpeVal,
                     shoes: document.getElementById('shoes').value,
                     wind: document.getElementById('wind').value,
@@ -668,12 +988,12 @@
                     totalVolume: evalRes.totalVolume,
                     trackLoad: evalRes.trackLoad,
                     runs: evalRes.runs
-                };
-                workouts.push(newW);
+                });
             }
 
             saveAndRender(evalRes.runs[0].distance);
-            clearAllRuns();
+            document.querySelectorAll('.run-time-input').forEach(inp => inp.value = '');
+            document.getElementById('notes').value = '';
         });
 
         function editWorkout(id) {
@@ -682,21 +1002,22 @@
 
             document.getElementById('editingWorkoutId').value = w.id;
             document.getElementById('date').value = w.date;
-            document.getElementById('sessionType').value = w.sessionType;
+            document.getElementById('sessionType').value = w.sessionType || 'ripetute';
+            document.getElementById('effortPreset').value = w.effortPreset || 'auto';
             document.getElementById('rpe').value = w.rpe;
             document.getElementById('shoes').value = w.shoes;
             document.getElementById('wind').value = w.wind;
             document.getElementById('notes').value = w.notes;
 
-            document.getElementById('formModeTitle').textContent = "✏️ Modifica Seduta";
+            handleSessionTypeUI();
+            document.getElementById('formModeTitle').textContent = "✏️ Modifica Rapida Seduta";
             document.getElementById('cancelEditBtn').classList.remove('hidden');
-            document.getElementById('submitWorkoutBtn').textContent = "Aggiorna Seduta";
+            document.getElementById('submitWorkoutBtn').textContent = "💾 Aggiorna Seduta";
 
-            // Ricostruisce le prove nel form
             document.getElementById('runsListContainer').innerHTML = '';
             w.runs.forEach(r => {
                 const hasSplits = r.splits && r.splits.length > 0;
-                appendRunRow(r.distance, r.timeSec, r.recovery, hasSplits, r.splits);
+                appendRunRow(r.distance, r.timeSec, r.recovery, hasSplits, r.splits || []);
             });
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -704,9 +1025,9 @@
 
         function resetFormToCreateMode() {
             document.getElementById('editingWorkoutId').value = '';
-            document.getElementById('formModeTitle').textContent = "➕ Nuova Seduta";
+            document.getElementById('formModeTitle').textContent = "➕ Registra Seduta";
             document.getElementById('cancelEditBtn').classList.add('hidden');
-            document.getElementById('submitWorkoutBtn').textContent = "Salva Seduta";
+            document.getElementById('submitWorkoutBtn').textContent = "💾 Salva Seduta";
             clearAllRuns();
         }
 
@@ -718,29 +1039,77 @@
 
         function saveAndRender(prefDist = null) {
             workouts = workouts.map(w => {
-                const ev = evaluateSessionLoad(w.runs || [], w.rpe);
+                const ev = evaluateSessionLoad(w.runs || [], w.rpe, w.sessionType || 'ripetute', w.effortPreset || 'auto');
                 return { ...w, runs: ev.runs, totalVolume: ev.totalVolume, trackLoad: ev.trackLoad };
             });
             workouts.sort((a, b) => new Date(a.date) - new Date(b.date));
-            localStorage.setItem('athletrack_workouts_v4', JSON.stringify(workouts));
+            localStorage.setItem('athletrack_workouts_v5', JSON.stringify(workouts));
 
             renderPersonalBests();
             renderTable();
             populateChartFilter(prefDist);
-            updateChart();
+            onChartDistanceChange();
         }
 
         // =========================================================================
-        // RENDERING MAPPE & TABELLE
+        // 7. GESTIONE TARGET PERSISTENTI & GRAFICO PAGINA 1
         // =========================================================================
+        function onChartDistanceChange() {
+            const dist = parseInt(document.getElementById('chartFilter').value, 10);
+            const inp = document.getElementById('targetTimeInput');
+            const sub = document.getElementById('targetStatusSubtext');
+
+            if (dist && targetTimesMap[dist]) {
+                inp.value = formatSeconds(targetTimesMap[dist], dist).replace('s', '');
+                sub.innerHTML = `<span class="text-emerald-400">✓ Target salvato per ${formatDistanceLabel(dist)}: <b>${formatSeconds(targetTimesMap[dist], dist)}</b></span>`;
+            } else {
+                inp.value = '';
+                sub.textContent = `Nessun target salvato per ${dist ? formatDistanceLabel(dist) : 'questa distanza'}`;
+            }
+            updateChart();
+        }
+
+        function saveCurrentTargetTime() {
+            const dist = parseInt(document.getElementById('chartFilter').value, 10);
+            const raw = document.getElementById('targetTimeInput').value;
+            const sec = parseTimeToSeconds(raw);
+            if (!dist || !sec) {
+                alert("Inserisci un tempo target valido (es. 11.60 o 24.00 o 3:55.0).");
+                return;
+            }
+            targetTimesMap[dist] = sec;
+            saveTargetsToStorage();
+            renderPersonalBests();
+            onChartDistanceChange();
+        }
+
+        function clearCurrentTargetTime() {
+            const dist = parseInt(document.getElementById('chartFilter').value, 10);
+            if (dist && targetTimesMap[dist]) {
+                delete targetTimesMap[dist];
+                saveTargetsToStorage();
+                renderPersonalBests();
+                onChartDistanceChange();
+            }
+        }
+
         function getDistanceStatsMap() {
             const map = {};
             workouts.forEach(w => {
                 (w.runs || []).forEach(r => {
                     const d = r.distance;
                     const eq = r.freshEquivalentSec || r.timeSec;
-                    if (!map[d] || r.timeSec < map[d].bestRawSec) {
-                        map[d] = { dist: d, bestRawSec: r.timeSec, bestRawDate: w.date, bestEqSec: eq };
+                    if (!map[d]) {
+                        map[d] = { dist: d, bestRawSec: r.timeSec, bestRawDate: w.date, bestEqSec: eq, bestEqOriginEffort: r.estimatedEffortPct || 88 };
+                    } else {
+                        if (r.timeSec < map[d].bestRawSec) {
+                            map[d].bestRawSec = r.timeSec;
+                            map[d].bestRawDate = w.date;
+                        }
+                        if (eq < map[d].bestEqSec) {
+                            map[d].bestEqSec = eq;
+                            map[d].bestEqOriginEffort = r.estimatedEffortPct || 88;
+                        }
                     }
                 });
             });
@@ -751,18 +1120,32 @@
             const container = document.getElementById('pbContainer');
             container.innerHTML = '';
             const map = getDistanceStatsMap();
-            const dists = Object.keys(map).map(Number).sort((a, b) => a - b);
+            const allDists = new Set([...Object.keys(map).map(Number), ...Object.keys(targetTimesMap).map(Number)]);
+            const dists = [...allDists].sort((a, b) => a - b);
 
-            if (dists.length === 0) { container.innerHTML = `<div class="col-span-full text-xs text-zinc-500 italic">Nessun record.</div>`; return; }
+            if (dists.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-xs text-zinc-500 italic">Nessun record registrato.</div>`;
+                return;
+            }
 
             dists.forEach(d => {
                 const st = map[d];
+                const savedTarget = targetTimesMap[d];
                 const card = document.createElement('div');
-                card.className = 'apple-card p-3 border-l-4 border-l-blue-500';
+                card.className = 'apple-card p-3 border-l-4 border-l-blue-500 flex flex-col justify-between';
                 card.innerHTML = `
-                    <div class="text-xs text-zinc-400 font-semibold">${formatDistanceLabel(d)}</div>
-                    <div class="text-lg font-bold text-white font-mono mt-0.5">${formatSeconds(st.bestRawSec, d)}</div>
-                    <div class="text-[11px] text-blue-400 mt-1">Carico: ${formatSeconds(st.bestEqSec, d)}</div>
+                    <div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-zinc-300 font-bold">${formatDistanceLabel(d)}</span>
+                            ${savedTarget ? `<span class="text-[10px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded font-mono">🎯 ${formatSeconds(savedTarget, d)}</span>` : ''}
+                        </div>
+                        <div class="text-lg font-bold text-white font-mono mt-0.5">
+                            ${st ? formatSeconds(st.bestRawSec, d) : '-'} <span class="text-[10px] font-normal text-zinc-400">PB</span>
+                        </div>
+                    </div>
+                    <div class="mt-1.5 pt-1 border-t border-white/5 text-[11px]">
+                        ${st ? `<span class="text-purple-300 font-mono">⚡ Vale Gara: <b>${formatSeconds(st.bestEqSec, d)}</b></span>` : `<span class="text-zinc-500">Solo Target</span>`}
+                    </div>
                 `;
                 container.appendChild(card);
             });
@@ -777,49 +1160,57 @@
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-white/5 transition align-top';
 
+                const typeLabel = w.sessionType === 'singola'
+                    ? `<span class="px-2 py-0.5 rounded text-[10px] bg-blue-500/20 text-blue-300 border border-blue-500/30 font-bold">🏁 Gara / Test (100%)</span>`
+                    : `<span class="px-2 py-0.5 rounded text-[10px] bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold">🔄 Ripetute (~${w.runs?.[0]?.estimatedEffortPct || 86}% sforzo iniziale)</span>`;
+
                 const runsHtml = (w.runs || []).map(r => {
+                    const showDiff = (r.timeSec - r.freshEquivalentSec) > 0.04;
                     let sHtml = '';
                     if (r.splits && r.splits.length > 0) {
-                        let prevD = 0, prevT = 0;
                         sHtml = `<div class="flex flex-wrap gap-1 mt-1">` + r.splits.map(s => {
-                            const segT = s.timeSec - prevT;
-                            const res = `<span class="text-[10px] bg-zinc-900 text-blue-300 px-1.5 py-0.5 rounded border border-white/10 font-mono">Pass. ${s.dist}m: ${formatSeconds(s.timeSec, s.dist)}</span>`;
-                            prevD = s.dist; prevT = s.timeSec;
-                            return res;
+                            return `<span class="text-[10px] bg-zinc-900 text-blue-300 px-1.5 py-0.5 rounded border border-white/10 font-mono">Pass. ${s.dist}m: ${formatSeconds(s.timeSec, s.dist)}</span>`;
                         }).join('') + `</div>`;
                     }
                     return `
-                        <div class="bg-black/30 px-2.5 py-1.5 rounded-lg border border-white/5 mb-1">
-                            <span class="text-xs font-bold text-zinc-400">#${r.repNumber}</span>
-                            <span class="font-bold text-white text-xs ml-1">${formatDistanceLabel(r.distance)}</span>
-                            <span class="font-mono font-bold text-blue-400 ml-2">${formatSeconds(r.timeSec, r.distance)}</span>
+                        <div class="bg-black/40 px-2.5 py-1.5 rounded-lg border border-white/5 mb-1.5">
+                            <div class="flex flex-wrap justify-between items-center gap-2">
+                                <div>
+                                    <span class="text-xs font-bold text-zinc-400">#${r.repNumber}</span>
+                                    <span class="font-bold text-white text-xs ml-1">${formatDistanceLabel(r.distance)}</span>
+                                    <span class="font-mono font-bold text-blue-400 ml-2">${formatSeconds(r.timeSec, r.distance)}</span>
+                                    ${r.recovery ? `<span class="text-[11px] text-zinc-400 ml-2">Rec: ${r.recovery}</span>` : ''}
+                                </div>
+                                ${showDiff ? `<span class="text-[11px] bg-purple-950/80 text-purple-300 px-2 py-0.5 rounded border border-purple-500/30 font-mono">⚡ Vale in Gara: <b>${formatSeconds(r.freshEquivalentSec, r.distance)}</b> (-${r.fatigueBonusPct}%)</span>` : ''}
+                            </div>
                             ${sHtml}
                         </div>
                     `;
                 }).join('');
 
                 tr.innerHTML = `
-                    <td class="py-3 px-2 font-mono text-xs text-zinc-300 whitespace-nowrap">${w.date}</td>
                     <td class="py-3 px-2 whitespace-nowrap">
-                        <div class="text-xs font-bold text-amber-400">🔥 ${w.trackLoad} pt</div>
-                        <div class="text-xs text-zinc-300 mt-0.5">${w.totalVolume}m • RPE ${w.rpe}</div>
+                        <div class="font-mono text-xs text-zinc-300 mb-1">${w.date}</div>
+                        ${typeLabel}
                     </td>
-                    <td class="py-3 px-2 min-w-[260px]">${runsHtml}</td>
-                    <td class="py-3 px-2 text-xs text-zinc-300 italic">"${w.notes || '-'}"</td>
+                    <td class="py-3 px-2 whitespace-nowrap">
+                        <div class="text-xs font-bold text-amber-400">🔥 Carico: ${w.trackLoad} pt</div>
+                        <div class="text-xs text-zinc-300 mt-0.5">Vol: ${w.totalVolume}m • RPE ${w.rpe}/10</div>
+                    </td>
+                    <td class="py-3 px-2 min-w-[290px]">${runsHtml}</td>
+                    <td class="py-3 px-2 text-xs text-zinc-300 italic max-w-xs">"${w.notes || '-'}"</td>
                     <td class="py-3 px-2 text-right whitespace-nowrap">
-                        <button onclick="editWorkout(${w.id})" class="text-blue-400 hover:text-blue-300 text-xs px-2 py-1 mr-1" title="Modifica">✏️</button>
-                        <button onclick="deleteWorkout(${w.id})" class="text-rose-400 hover:text-rose-300 text-xs px-2 py-1" title="Elimina">🗑️</button>
+                        <button onclick="editWorkout(${w.id})" class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 text-xs px-2.5 py-1 rounded-lg border border-blue-500/30 mr-1 transition">✏️ Modifica</button>
+                        <button onclick="deleteWorkout(${w.id})" class="text-rose-400 hover:text-rose-300 text-xs px-2 py-1">🗑️</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        // =========================================================================
-        // GRAFICO CON LINEA TARGET / PROJECTED TIME
-        // =========================================================================
         function populateChartFilter(prefDist = null) {
             const select = document.getElementById('chartFilter');
+            const currentVal = prefDist || select.value;
             const distSet = new Set();
             workouts.forEach(w => (w.runs || []).forEach(r => distSet.add(r.distance)));
             const dists = [...distSet].sort((a, b) => a - b);
@@ -828,8 +1219,8 @@
             dists.forEach(d => {
                 const opt = document.createElement('option');
                 opt.value = d;
-                opt.textContent = formatDistanceLabel(d);
-                if (String(d) === String(prefDist)) opt.selected = true;
+                opt.textContent = `Distanza: ${formatDistanceLabel(d)}`;
+                if (String(d) === String(currentVal)) opt.selected = true;
                 select.appendChild(opt);
             });
         }
@@ -844,35 +1235,58 @@
             workouts.forEach(w => {
                 const matching = (w.runs || []).filter(r => r.distance === dist);
                 if (matching.length > 0) {
-                    const best = Math.min(...matching.map(r => r.timeSec));
-                    points.push({ date: w.date, best });
+                    const bestRaw = Math.min(...matching.map(r => r.timeSec));
+                    const avgRaw = matching.reduce((a, r) => a + r.timeSec, 0) / matching.length;
+                    const bestEq = Math.min(...matching.map(r => r.freshEquivalentSec || r.timeSec));
+                    points.push({
+                        date: w.date + (w.sessionType === 'singola' ? ' (Gara)' : ` (${matching.length}x)`),
+                        bestRaw, avgRaw, bestEq
+                    });
                 }
             });
 
             if (points.length === 0) return;
 
-            const datasets = [{
-                label: 'Miglior Tempo',
-                data: points.map(p => p.best),
-                borderColor: '#0a84ff',
-                backgroundColor: 'rgba(10, 132, 255, 0.1)',
-                pointBackgroundColor: '#0a84ff',
-                pointRadius: 5,
-                tension: 0.25,
-                fill: true
-            }];
+            const datasets = [
+                {
+                    label: 'Crono Reale',
+                    data: points.map(p => p.bestRaw),
+                    borderColor: '#0a84ff',
+                    backgroundColor: 'rgba(10, 132, 255, 0.08)',
+                    pointBackgroundColor: '#0a84ff',
+                    pointRadius: 5,
+                    tension: 0.25
+                },
+                {
+                    label: 'Media Serie',
+                    data: points.map(p => p.avgRaw),
+                    borderColor: '#30d158',
+                    borderDash: [4, 4],
+                    pointRadius: 3,
+                    tension: 0.25
+                },
+                {
+                    label: '⚡ Valore Gara Singola (Scontato delle Ripetute)',
+                    data: points.map(p => p.bestEq),
+                    borderColor: '#bf5af2',
+                    backgroundColor: 'rgba(191, 90, 242, 0.12)',
+                    pointBackgroundColor: '#bf5af2',
+                    pointRadius: 6,
+                    borderWidth: 2.5,
+                    tension: 0.25,
+                    fill: true
+                }
+            ];
 
-            const showTarget = document.getElementById('showTargetLine').checked;
-            const targetVal = parseTimeToSeconds(document.getElementById('targetTimeInput').value);
-
-            if (showTarget && targetVal) {
+            const savedTarget = targetTimesMap[dist] || parseTimeToSeconds(document.getElementById('targetTimeInput').value);
+            if (savedTarget) {
                 datasets.push({
-                    label: 'Target / Projected Time',
-                    data: new Array(points.length).fill(targetVal),
+                    label: `🎯 Tuo Target (${formatSeconds(savedTarget, dist)})`,
+                    data: new Array(points.length).fill(savedTarget),
                     borderColor: '#ff9f0a',
                     borderDash: [6, 6],
                     pointRadius: 0,
-                    borderWidth: 2
+                    borderWidth: 2.5
                 });
             }
 
@@ -882,7 +1296,7 @@
                 options: {
                     responsive: true, maintainAspectRatio: false,
                     scales: {
-                        y: { ticks: { color: '#98989d', callback: v => formatSeconds(v, dist) }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        y: { ticks: { color: '#98989d', callback: v => formatSeconds(v, dist) }, grid: { color: 'rgba(255,255,255,0.06)' } },
                         x: { ticks: { color: '#98989d' }, grid: { color: 'rgba(255,255,255,0.02)' } }
                     },
                     plugins: { legend: { labels: { color: '#f5f5f7', font: { size: 11 } } } }
@@ -891,97 +1305,7 @@
         }
 
         // =========================================================================
-        // PAGINA 3: ANALISI INTERTEMPI & VELOCITÀ NEI TRATTI
-        // =========================================================================
-        function populateSplitSessionSelect() {
-            const select = document.getElementById('splitSessionSelect');
-            select.innerHTML = '';
-            let count = 0;
-
-            workouts.forEach(w => {
-                (w.runs || []).forEach((r, rIdx) => {
-                    if (r.splits && r.splits.length > 0) {
-                        count++;
-                        const opt = document.createElement('option');
-                        opt.value = `${w.id}_${rIdx}`;
-                        opt.textContent = `${w.date} - ${formatDistanceLabel(r.distance)} (#${r.repNumber}, ${r.timeSec}s)`;
-                        select.appendChild(opt);
-                    }
-                });
-            });
-
-            if (count === 0) {
-                select.innerHTML = `<option value="">Nessun intertempo registrato</option>`;
-            }
-        }
-
-        function renderSplitAnalysisDetails() {
-            const val = document.getElementById('splitSessionSelect').value;
-            const container = document.getElementById('splitAnalysisContent');
-            container.innerHTML = '';
-
-            if (!val) {
-                container.innerHTML = `<div class="text-xs text-zinc-500 italic">Registra almeno una prova inserendo gli intertempi (Sì) per sbloccare l'analisi dei tratti.</div>`;
-                return;
-            }
-
-            const [wId, rIdx] = val.split('_');
-            const w = workouts.find(item => item.id == wId);
-            if (!w) return;
-            const r = w.runs[rIdx];
-
-            let prevDist = 0;
-            let prevTime = 0;
-            let html = `<div class="space-y-3">`;
-
-            r.splits.forEach(s => {
-                const segDist = s.dist - prevDist;
-                const segTime = s.timeSec - prevTime;
-                const speedMs = (segDist / segTime).toFixed(2);
-                const speedKmh = ((segDist / segTime) * 3.6).toFixed(1);
-
-                html += `
-                    <div class="bg-black/40 p-3.5 rounded-xl border border-white/5 flex justify-between items-center">
-                        <div>
-                            <div class="text-xs font-semibold text-blue-400">Tratto ${prevDist}m ➔ ${s.dist}m (${segDist} metri)</div>
-                            <div class="text-sm font-bold text-white mt-0.5">Tempo frazione: ${segTime.toFixed(2)}s (Passaggio: ${formatSeconds(s.timeSec, s.dist)})</div>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-sm font-mono font-bold text-emerald-400">${speedMs} m/s</div>
-                            <div class="text-[11px] text-zinc-400">${speedKmh} km/h</div>
-                        </div>
-                    </div>
-                `;
-                prevDist = s.dist; prevTime = s.timeSec;
-            });
-
-            // Tratto finale fino al traguardo
-            if (prevDist < r.distance) {
-                const segDist = r.distance - prevDist;
-                const segTime = r.timeSec - prevTime;
-                const speedMs = (segDist / segTime).toFixed(2);
-                const speedKmh = ((segDist / segTime) * 3.6).toFixed(1);
-
-                html += `
-                    <div class="bg-black/40 p-3.5 rounded-xl border border-white/5 flex justify-between items-center">
-                        <div>
-                            <div class="text-xs font-semibold text-emerald-400">Tratto Finale ${prevDist}m ➔ ${r.distance}m (${segDist} metri)</div>
-                            <div class="text-sm font-bold text-white mt-0.5">Chiusura: ${segTime.toFixed(2)}s</div>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-sm font-mono font-bold text-emerald-400">${speedMs} m/s</div>
-                            <div class="text-[11px] text-zinc-400">${speedKmh} km/h</div>
-                        </div>
-                    </div>
-                `;
-            }
-
-            html += `</div>`;
-            container.innerHTML = html;
-        }
-
-        // =========================================================================
-        // PAGINA LAB & STIME
+        // 8. PAGINA 2: LAB & STIME (CON DIFFERENZIALE RIPETUTE vs GARA SINGOLA)
         // =========================================================================
         function renderLabPage() {
             const map = getDistanceStatsMap();
@@ -993,7 +1317,8 @@
 
             dists.forEach(d => {
                 const st = map[d];
-                const sc = calculateScoreForTime(d, st.bestRawSec);
+                const effectiveSec = Math.min(st.bestRawSec, st.bestEqSec);
+                const sc = calculateScoreForTime(d, effectiveSec);
                 catSc[getStandardForDistance(d).cat].push(sc);
                 if (sc > maxSc) { maxSc = sc; bestD = d; }
             });
@@ -1002,12 +1327,30 @@
             const mAvg = catSc.mid.length ? Math.max(...catSc.mid) : 0;
             const lAvg = catSc.long.length ? Math.max(...catSc.long) : 0;
 
-            document.getElementById('bestEventBadge').textContent = `${formatDistanceLabel(bestD)} (${formatSeconds(map[bestD].bestRawSec, bestD)})`;
-            document.getElementById('bestScoreBadge').textContent = `${Math.round(maxSc)} pt`;
+            const bestEffective = Math.min(map[bestD].bestRawSec, map[bestD].bestEqSec);
+            document.getElementById('bestEventBadge').textContent = `${formatDistanceLabel(bestD)} (${formatSeconds(bestEffective, bestD)})`;
+            document.getElementById('bestScoreBadge').textContent = `${Math.round(maxSc)} pt fisiologici`;
 
             document.getElementById('sprintScoreText').textContent = `${Math.round(sAvg)} pt`; document.getElementById('sprintBar').style.width = `${Math.min(100, Math.round(sAvg/10))}%`;
             document.getElementById('midScoreText').textContent = `${Math.round(mAvg)} pt`; document.getElementById('midBar').style.width = `${Math.min(100, Math.round(mAvg/10))}%`;
             document.getElementById('longScoreText').textContent = `${Math.round(lAvg)} pt`; document.getElementById('longBar').style.width = `${Math.min(100, Math.round(lAvg/10))}%`;
+
+            const endur = Math.max(mAvg, lAvg);
+            const titleEl = document.getElementById('athleteProfileTitle');
+            const descEl = document.getElementById('athleteProfileDesc');
+
+            if (endur > 0 && sAvg > 0) {
+                if (endur - sAvg > 45) {
+                    titleEl.textContent = "🫀 Forte Motore Aerobico (Grande Margine nello Sprint!)";
+                    descEl.innerHTML = `Tenendo conto sia delle gare sia della riserva conservativa nelle ripetute, il tuo motore resistente (<b>${Math.round(endur)} pt</b>) supera la velocità pura (<b>${Math.round(sAvg)} pt</b>). Puoi scendere drasticamente sui 60m-400m.`;
+                } else if (sAvg - endur > 45) {
+                    titleEl.textContent = "⚡ Profilo Veloce/Anaerobico (Grande Margine sul Fondo)";
+                    descEl.innerHTML = `Esprimi alti valori nello sprint e nelle ripetute brevi (<b>${Math.round(sAvg)} pt</b>), con ampio margine di miglioramento aerobico dai 1500m in su.`;
+                } else {
+                    titleEl.textContent = "⚖️ Profilo Atleta Completo e Bilanciato";
+                    descEl.innerHTML = `Ottimo equilibrio tra fibre veloci (<b>${Math.round(sAvg)} pt</b>) e resistenza (<b>${Math.round(endur)} pt</b>).`;
+                }
+            }
 
             const tbody = document.getElementById('predictionsTableBody');
             tbody.innerHTML = '';
@@ -1015,14 +1358,29 @@
             ATHLETIC_STANDARDS.forEach(std => {
                 const st = map[std.dist];
                 const pot = estimateTimeForScore(std.dist, maxSc);
-                let pbStr = `<span class="text-zinc-500">-</span>`, loadStr = `-`, marginStr = `-`, diag = `-`;
+                const target = targetTimesMap[std.dist];
+
+                let pbStr = `<span class="text-zinc-500">-</span>`;
+                let eqStr = `<span class="text-zinc-500">-</span>`;
+                let targetStr = target ? `<span class="font-mono font-bold text-amber-400">${formatSeconds(target, std.dist)}</span>` : `<span class="text-xs text-zinc-500">Non fissato</span>`;
+                let diag = `<span class="text-xs text-zinc-400">Stima da motore</span>`;
 
                 if (st) {
                     pbStr = `<span class="font-mono font-bold text-white">${formatSeconds(st.bestRawSec, std.dist)}</span>`;
-                    loadStr = `<span class="font-mono text-blue-400">${formatSeconds(st.bestEqSec, std.dist)}</span>`;
-                    const diff = st.bestRawSec - pot;
-                    marginStr = `<span class="font-mono text-emerald-400">-${formatSeconds(diff, std.dist)}</span>`;
-                    diag = `<span class="px-2 py-0.5 rounded text-xs bg-blue-500/10 text-blue-300">Potenziale</span>`;
+                    const diffRep = st.bestRawSec - st.bestEqSec;
+                    eqStr = diffRep > 0.05
+                        ? `<span class="font-mono font-bold text-purple-400">${formatSeconds(st.bestEqSec, std.dist)}</span>
+                           <span class="block text-[10px] text-zinc-400">Da ripetute al ~${st.bestEqOriginEffort}%</span>`
+                        : `<span class="font-mono text-zinc-300">${formatSeconds(st.bestEqSec, std.dist)}</span>`;
+
+                    const marginToPot = st.bestRawSec - pot;
+                    if (target && st.bestEqSec <= target) {
+                        diag = `<span class="px-2 py-1 rounded text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold">✅ Target già nelle gambe!</span>`;
+                    } else if (marginToPot > st.bestRawSec * 0.05) {
+                        diag = `<span class="px-2 py-1 rounded text-xs bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold">🔥 Limabili -${formatSeconds(marginToPot, std.dist)}</span>`;
+                    } else {
+                        diag = `<span class="px-2 py-1 rounded text-xs bg-blue-500/20 text-blue-300">📈 Margine: -${formatSeconds(Math.max(0, marginToPot), std.dist)}</span>`;
+                    }
                 }
 
                 const tr = document.createElement('tr');
@@ -1030,40 +1388,357 @@
                 tr.innerHTML = `
                     <td class="py-3 px-2 font-bold text-zinc-200">${std.label}</td>
                     <td class="py-3 px-2">${pbStr}</td>
-                    <td class="py-3 px-2">${loadStr}</td>
+                    <td class="py-3 px-2">${eqStr}</td>
+                    <td class="py-3 px-2">${targetStr}</td>
                     <td class="py-3 px-2 font-mono font-bold text-emerald-400">${formatSeconds(pot, std.dist)}</td>
-                    <td class="py-3 px-2">${marginStr}</td>
                     <td class="py-3 px-2">${diag}</td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
+        // =========================================================================
+        // 9. PAGINA 3: STRATEGIA NON-LINEARE, PASSAGGI & "DOVE ROSICCHIARE TEMPO"
+        // =========================================================================
+        function populateSplitSessionSelect() {
+            const select = document.getElementById('splitSessionSelect');
+            const prevVal = select.value;
+            select.innerHTML = '';
+            let count = 0;
+
+            workouts.forEach(w => {
+                (w.runs || []).forEach((r, rIdx) => {
+                    if (r.splits && r.splits.length > 0) {
+                        count++;
+                        const opt = document.createElement('option');
+                        opt.value = `${w.id}_${rIdx}`;
+                        opt.textContent = `${w.date} • ${formatDistanceLabel(r.distance)} in ${formatSeconds(r.timeSec, r.distance)} (${w.sessionType === 'singola' ? 'Gara' : 'Ripetuta #' + r.repNumber})`;
+                        if (opt.value === prevVal) opt.selected = true;
+                        select.appendChild(opt);
+                    }
+                });
+            });
+
+            if (count === 0) {
+                select.innerHTML = `<option value="">Nessuna prova con intertempi registrata</option>`;
+            }
+        }
+
+        function onSplitRunChange() {
+            document.getElementById('splitSimDistSelect').value = '';
+            renderSplitAnalysisDetails();
+        }
+
+        function onSimDistChange() {
+            renderSplitAnalysisDetails();
+        }
+
+        function getActiveSplitPageDistance() {
+            const simDist = parseInt(document.getElementById('splitSimDistSelect').value, 10);
+            if (simDist) return simDist;
+
+            const val = document.getElementById('splitSessionSelect').value;
+            if (!val) return 200;
+            const [wId, rIdx] = val.split('_');
+            const w = workouts.find(item => item.id == wId);
+            return w ? w.runs[rIdx].distance : 200;
+        }
+
+        function saveTargetFromSplitPage() {
+            const dist = getActiveSplitPageDistance();
+            const raw = document.getElementById('splitPageTargetInput').value;
+            const sec = parseTimeToSeconds(raw);
+            if (!dist || !sec) {
+                alert("Inserisci un Tempo Target valido.");
+                return;
+            }
+            targetTimesMap[dist] = sec;
+            saveTargetsToStorage();
+            renderPersonalBests();
+            onChartDistanceChange();
+            renderSplitAnalysisDetails();
+        }
+
+        function renderSplitAnalysisDetails() {
+            const simDist = parseInt(document.getElementById('splitSimDistSelect').value, 10);
+            const val = document.getElementById('splitSessionSelect').value;
+            const coachContainer = document.getElementById('coachAdviceContainer');
+            const tbody = document.getElementById('splitTableBody');
+
+            let totalDist = 200;
+            let actualRun = null;
+            let checkpointDists = [];
+
+            if (simDist) {
+                totalDist = simDist;
+                if (simDist === 100) checkpointDists = [30, 60, 100];
+                else if (simDist === 200) checkpointDists = [50, 100, 150, 200];
+                else if (simDist === 400) checkpointDists = [100, 200, 300, 400];
+                else if (simDist === 800) checkpointDists = [200, 400, 600, 800];
+                else if (simDist === 1500) checkpointDists = [300, 700, 1100, 1500];
+                else checkpointDists = [1000, 2000, 3000, 4000, 5000];
+            } else if (val) {
+                const [wId, rIdx] = val.split('_');
+                const w = workouts.find(item => item.id == wId);
+                if (w && w.runs[rIdx]) {
+                    actualRun = w.runs[rIdx];
+                    totalDist = actualRun.distance;
+                    checkpointDists = [...actualRun.splits.map(s => s.dist), totalDist];
+                }
+            }
+
+            // Carica o stima il Target Time per questa distanza
+            let targetSec = targetTimesMap[totalDist];
+            if (!targetSec) {
+                targetSec = actualRun ? +(actualRun.timeSec * 0.965).toFixed(2) : getStandardForDistance(totalDist).t500;
+            }
+            document.getElementById('splitPageTargetInput').value = formatSeconds(targetSec, totalDist).replace('s', '');
+
+            if (checkpointDists.length === 0) {
+                coachContainer.innerHTML = `<div class="text-xs text-zinc-400">Seleziona una prova con intertempi o usa il simulatore.</div>`;
+                tbody.innerHTML = '';
+                return;
+            }
+
+            // Calcola i passaggi ideali non-lineari per il Target Time
+            const idealSegments = computeNonLinearTargetSplits(totalDist, checkpointDists, targetSec);
+
+            // Costruisci il confronto con la prova reale (se selezionata)
+            let prevActualTime = 0;
+            const comparison = idealSegments.map((idSeg, idx) => {
+                let actualCum = null;
+                if (actualRun) {
+                    if (idx < actualRun.splits.length) actualCum = actualRun.splits[idx].timeSec;
+                    else actualCum = actualRun.timeSec;
+                }
+                const actualSegTime = actualCum !== null ? (actualCum - prevActualTime) : null;
+                const actualSegSpeed = actualSegTime ? (idSeg.segDist / actualSegTime) : null;
+                const segDelta = actualSegTime !== null ? (actualSegTime - idSeg.idealSegTime) : 0; // Positivo = più lento del target nel tratto
+                prevActualTime = actualCum || 0;
+
+                return {
+                    ...idSeg,
+                    actualCumTime: actualCum,
+                    actualSegTime: actualSegTime,
+                    actualSegSpeedMs: actualSegSpeed,
+                    segDelta: segDelta
+                };
+            });
+
+            // 1. Disegna il Grafico della Curva Non-Lineare (Velocità nei Tratti)
+            const ctx = document.getElementById('splitPacingChart').getContext('2d');
+            if (splitChartInstance) splitChartInstance.destroy();
+
+            const labels = comparison.map(c => `${c.startDist}➔${c.endDist}m`);
+            const chartDatasets = [
+                {
+                    label: `🎯 Velocità Ideale per Target (${formatSeconds(targetSec, totalDist)})`,
+                    data: comparison.map(c => +c.idealSegSpeedMs.toFixed(2)),
+                    borderColor: '#ff9f0a',
+                    backgroundColor: 'rgba(255, 159, 10, 0.12)',
+                    borderDash: [5, 5],
+                    pointBackgroundColor: '#ff9f0a',
+                    pointRadius: 5,
+                    tension: 0.3,
+                    fill: true
+                }
+            ];
+
+            if (actualRun) {
+                chartDatasets.unshift({
+                    label: `🔵 Tua Velocità Reale (${formatSeconds(actualRun.timeSec, totalDist)})`,
+                    data: comparison.map(c => +c.actualSegSpeedMs.toFixed(2)),
+                    borderColor: '#0a84ff',
+                    backgroundColor: 'rgba(10, 132, 255, 0.15)',
+                    pointBackgroundColor: '#0a84ff',
+                    pointRadius: 6,
+                    borderWidth: 2.5,
+                    tension: 0.3
+                });
+            }
+
+            splitChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: { labels, datasets: chartDatasets },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        y: { ticks: { color: '#98989d', callback: v => v + ' m/s' }, grid: { color: 'rgba(255,255,255,0.06)' } },
+                        x: { ticks: { color: '#f5f5f7' }, grid: { color: 'rgba(255,255,255,0.03)' } }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#f5f5f7', font: { size: 11 } } },
+                        tooltip: {
+                            callbacks: {
+                                afterBody: function(context) {
+                                    const c = comparison[context[0].dataIndex];
+                                    return `Passaggio Target a ${c.endDist}m: ${formatSeconds(c.idealCumTime, totalDist)} (${c.phaseName})`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 2. Genera Diagnosi AI "Dove Rosicchiare Tempo"
+            coachContainer.innerHTML = '';
+            if (actualRun) {
+                // Trova il tratto dove perde più tempo rispetto alla curva ideale
+                const worstSegment = [...comparison].sort((a, b) => b.segDelta - a.segDelta)[0];
+                const firstSeg = comparison[0];
+                const lastSeg = comparison[comparison.length - 1];
+
+                // Caso 1: Partenza troppo forte (Overpacing) e crollo finale
+                if (firstSeg.segDelta < -0.08 && lastSeg.segDelta > 0.25) {
+                    coachContainer.innerHTML += `
+                        <div class="bg-rose-950/50 p-3.5 rounded-xl border border-rose-500/40">
+                            <div class="text-xs font-bold text-rose-300 uppercase">⚠️ Errore di Distribuzione (Partenza Troppo Aggressiva!)</div>
+                            <p class="text-xs text-zinc-200 mt-1 leading-relaxed">
+                                Nel tratto iniziale <b>${firstSeg.startDist}➔${firstSeg.endDist}m</b> sei andato <b>${Math.abs(firstSeg.segDelta).toFixed(2)}s più veloce</b> di quanto richiesto per il tuo target, accumulando acido lattico precoce e perdendo <b>+${lastSeg.segDelta.toFixed(2)}s</b> nell'ultimo tratto! <b>Consiglio:</b> Risparmia energie nei primi ${firstSeg.endDist}m passando a <b>${formatSeconds(firstSeg.idealCumTime, totalDist)}</b>.
+                            </p>
+                        </div>
+                    `;
+                }
+
+                // Caso 2: Tratto dove è più facile rosicchiare tempo
+                if (worstSegment && worstSegment.segDelta > 0.03) {
+                    coachContainer.innerHTML += `
+                        <div class="bg-emerald-950/50 p-3.5 rounded-xl border border-emerald-500/40">
+                            <div class="text-xs font-bold text-emerald-300 uppercase">🔥 Punto Chiave Dove Rosicchiare Tempo: ${worstSegment.startDist}➔${worstSegment.endDist}m</div>
+                            <p class="text-xs text-zinc-200 mt-1 leading-relaxed">
+                                È nella fase <b>"${worstSegment.phaseName}" (${worstSegment.startDist}➔${worstSegment.endDist}m)</b> che hai il margine più grande: qui hai corso in <b>${formatSeconds(worstSegment.actualSegTime, worstSegment.segDist)}</b> contro il parziale ideale di <b>${formatSeconds(worstSegment.idealSegTime, worstSegment.segDist)}</b>. Puoi rosicchiare fino a <b>-${worstSegment.segDelta.toFixed(2)}s</b> lavorando su: <i>${worstSegment.phaseTip}</i>.
+                            </p>
+                        </div>
+                    `;
+                }
+
+                // Sintesi Passaggi Chiave
+                const passList = comparison.map(c => `<span class="font-mono text-amber-300"><b>${c.endDist}m</b> in ${formatSeconds(c.idealCumTime, totalDist)}</span>`).join(' ➔ ');
+                coachContainer.innerHTML += `
+                    <div class="bg-zinc-900/90 p-3.5 rounded-xl border border-white/10">
+                        <div class="text-xs font-bold text-amber-400">🎯 I Tuoi Passaggi Obiettivo per fare ${formatSeconds(targetSec, totalDist)}:</div>
+                        <div class="text-xs text-zinc-200 mt-1.5 leading-relaxed">${passList}</div>
+                    </div>
+                `;
+            } else {
+                const passList = comparison.map(c => `<span class="font-mono text-amber-300"><b>${c.endDist}m</b> in ${formatSeconds(c.idealCumTime, totalDist)}</span>`).join(' ➔ ');
+                coachContainer.innerHTML = `
+                    <div class="bg-zinc-900/90 p-4 rounded-xl border border-amber-500/30">
+                        <div class="text-xs font-bold text-amber-400 uppercase">🎯 Simulazione Strategia Non-Lineare (${formatDistanceLabel(totalDist)} in ${formatSeconds(targetSec, totalDist)})</div>
+                        <p class="text-xs text-zinc-300 mt-1.5">Passaggi ideali calcolati sul modello biomeccanico:</p>
+                        <div class="text-xs mt-2 leading-relaxed">${passList}</div>
+                    </div>
+                `;
+            }
+
+            // 3. Popola Tabella Passaggi
+            tbody.innerHTML = '';
+            comparison.forEach(c => {
+                let actionBadge = `<span class="text-xs text-zinc-400">${c.phaseTip}</span>`;
+                if (c.actualSegTime !== null) {
+                    if (c.segDelta > 0.15) {
+                        actionBadge = `<span class="px-2 py-0.5 rounded text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold">🔥 Rosicchia qui -${c.segDelta.toFixed(2)}s!</span>
+                                       <span class="block text-[11px] text-zinc-400 mt-0.5">${c.phaseTip}</span>`;
+                    } else if (c.segDelta < -0.10) {
+                        actionBadge = `<span class="px-2 py-0.5 rounded text-xs bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold">🧘 Controlla (+${Math.abs(c.segDelta).toFixed(2)}s più piano)</span>
+                                       <span class="block text-[11px] text-zinc-400 mt-0.5">Risparmia energie per il finale</span>`;
+                    } else {
+                        actionBadge = `<span class="px-2 py-0.5 rounded text-xs bg-blue-500/20 text-blue-300">✅ Ritmo Perfetto (${c.segDelta >= 0 ? '+' : ''}${c.segDelta.toFixed(2)}s)</span>`;
+                    }
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-white/5 transition';
+                tr.innerHTML = `
+                    <td class="py-3 px-2">
+                        <div class="font-bold text-white">${c.startDist}m ➔ ${c.endDist}m</div>
+                        <div class="text-[11px] text-blue-400">${c.phaseName}</div>
+                    </td>
+                    <td class="py-3 px-2 font-mono font-bold text-zinc-200">
+                        ${c.actualCumTime !== null ? formatSeconds(c.actualCumTime, totalDist) : '-'}
+                    </td>
+                    <td class="py-3 px-2 font-mono font-bold text-amber-400 text-base">
+                        ${formatSeconds(c.idealCumTime, totalDist)}
+                    </td>
+                    <td class="py-3 px-2 font-mono text-xs">
+                        <span class="text-zinc-300">Tuo: ${c.actualSegTime !== null ? formatSeconds(c.actualSegTime, c.segDist) : '-'}</span>
+                        <span class="block text-emerald-400 font-bold">Target: ${formatSeconds(c.idealSegTime, c.segDist)}</span>
+                    </td>
+                    <td class="py-3 px-2 font-mono text-xs">
+                        <span class="text-zinc-300">${c.actualSegSpeedMs ? c.actualSegSpeedMs.toFixed(2) + ' m/s' : '-'}</span>
+                        <span class="block text-amber-300">Target: ${c.idealSegSpeedMs.toFixed(2)} m/s</span>
+                    </td>
+                    <td class="py-3 px-2">${actionBadge}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // =========================================================================
+        // 10. BACKUP & DATI DIMOSTRATIVI PRECARICATI
+        // =========================================================================
         function exportData() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(workouts, null, 2));
-            const a = document.createElement('a'); a.href = dataStr; a.download = `athletrack_apple_backup.json`; a.click();
+            const payload = { workouts, targetTimesMap };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(payload, null, 2));
+            const a = document.createElement('a'); a.href = dataStr; a.download = `athletrack_v5_backup.json`; a.click();
         }
 
         function importData(e) {
             const file = e.target.files[0]; if (!file) return;
             const r = new FileReader();
             r.onload = function(evt) {
-                try { workouts = JSON.parse(evt.target.result); saveAndRender(); alert("Importato!"); } catch(err) { alert("File non valido"); }
+                try {
+                    const parsed = JSON.parse(evt.target.result);
+                    if (Array.isArray(parsed)) {
+                        workouts = parsed;
+                    } else if (parsed.workouts) {
+                        workouts = parsed.workouts;
+                        targetTimesMap = parsed.targetTimesMap || {};
+                        saveTargetsToStorage();
+                    }
+                    saveAndRender();
+                    alert("Backup importato!");
+                } catch(err) { alert("File JSON non valido"); }
             };
             r.readAsText(file);
         }
 
-        // Dati d'esempio se vuoto
+        // Precarica Target Persistenti e Allenamenti con Intertempi non-lineari se vuoto
         if (workouts.length === 0) {
-            workouts = [{
-                id: 1, date: "2026-10-20", sessionType: "ripetute", rpe: 8, shoes: "Chiodate", wind: "+0.5 m/s", notes: "Test intertempi", totalVolume: 200, trackLoad: 120,
-                runs: [{ repNumber: 1, distance: 200, timeSec: 25.50, recovery: "3'00\"", splits: [{ dist: 100, timeSec: 12.80 }] }]
-            }];
+            targetTimesMap = { 100: 11.80, 200: 24.00, 400: 53.50, 5000: 1035 };
+            saveTargetsToStorage();
+
+            workouts = [
+                {
+                    id: 101, date: "2026-10-12", sessionType: "singola", effortPreset: "1.00", rpe: 9, shoes: "Chiodate", wind: "+0.4 m/s",
+                    notes: "Gara 200m (24.80s): partito fortissimo nei primi 50m, seduto tra 100 e 150m.",
+                    runs: [
+                        {
+                            repNumber: 1, distance: 200, timeSec: 24.80, recovery: "Gara",
+                            splits: [{ dist: 50, timeSec: 6.15 }, { dist: 100, timeSec: 12.10 }, { dist: 150, timeSec: 18.55 }]
+                        }
+                    ]
+                },
+                {
+                    id: 102, date: "2026-10-20", sessionType: "ripetute", effortPreset: "0.85", rpe: 8, shoes: "Chiodate", wind: "+0.0 m/s",
+                    notes: "4x200m in controllo (~85% sforzo) + 1x400m finale con passaggi ogni 100m",
+                    runs: [
+                        { repNumber: 1, distance: 200, timeSec: 26.10, recovery: "2'30\"", splits: [{ dist: 100, timeSec: 13.30 }] },
+                        { repNumber: 2, distance: 200, timeSec: 25.95, recovery: "2'30\"", splits: [{ dist: 100, timeSec: 13.20 }] },
+                        { repNumber: 3, distance: 200, timeSec: 26.00, recovery: "2'30\"", splits: [{ dist: 100, timeSec: 13.25 }] },
+                        { repNumber: 4, distance: 200, timeSec: 25.70, recovery: "4'00\"", splits: [{ dist: 100, timeSec: 13.05 }] },
+                        {
+                            repNumber: 5, distance: 400, timeSec: 55.80, recovery: "Fine",
+                            splits: [{ dist: 100, timeSec: 12.80 }, { dist: 200, timeSec: 26.20 }, { dist: 300, timeSec: 40.50 }]
+                        }
+                    ]
+                }
+            ];
         }
 
-        appendRunRow(100, '', '2\'30"', false, []);
-        saveAndRender(100);
+        handleSessionTypeUI();
+        appendRunRow(200, '', '2\'30"', false, []);
+        saveAndRender(200);
     </script>
 </body>
 </html>
-
